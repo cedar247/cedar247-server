@@ -19,12 +19,15 @@ const getConsultants = async (req,res)=>{
 //create consultant
 
 const CreateConsultant = async (req,res)=>{
+    console.log(req.body)
     const {name,phoneNumber,email,WardID} = req.body
-
+  
     try{
-    const consultant = await Consultant.create({name,phoneNumber,email,WardID})
+    const consultant = await Consultant.create(    
+        {name,phoneNumber,email,WardID}
+    )
 
-    res.status(200).json(consultant)
+    res.status(200).json({msg: "Success"})
     }catch(error){
         return res.status(400).json({msg: error.message})
     }
@@ -33,10 +36,10 @@ const CreateConsultant = async (req,res)=>{
 
 
 const CreateDoctor = async (req,res)=>{
+    console.log(req.body)
     const {name,phoneNumber,email,category,WardID} = req.body
-
     try{
-    const consultant = await Consultant.create({name,phoneNumber,email,category,WardID})
+    const consultant = await Doctor.create({name,phoneNumber,email,category,WardID})
     res.status(200).json({msg: "Success"})
     }catch(error){
         res.status(400).json({msg: error.message})

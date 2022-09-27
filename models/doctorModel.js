@@ -9,7 +9,7 @@ const DoctorSchema = new Schema({
     }
     ,
     phoneNumber:{
-        type : Array,
+        type : String,
         required : true
     }
     ,

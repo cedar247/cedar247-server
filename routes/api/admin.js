@@ -1,7 +1,7 @@
 const express = require('express')
 const{CreateConsultant,
     getConsultants,
-    getConsultant} = require('../../controllers/adminController')
+    getConsultant,CreateDoctor} = require('../../controllers/adminController')
 
 const router = express.Router()
 
@@ -10,7 +10,7 @@ const router = express.Router()
 router.get('/',getConsultants)
 router.get('/:id',getConsultant)
 router.post('/consultant',CreateConsultant)
-router.post('/doctor',CreateConsultant)
+router.post('/doctor',CreateDoctor)
 
 router.delete('/:id',(req,res)=>{
 
