@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
-const ConsultantSchema = new Schema({
+const leaveSchema = new Schema({
     date:{
         type : Date,
         required : true
@@ -15,4 +15,4 @@ const ConsultantSchema = new Schema({
     
 },{timestamps : true})
 
-module.exports = mongoose.model('consultant',ConsultantSchema)
+module.exports = mongoose.model('leave',leaveSchema)
