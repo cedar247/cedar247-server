@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 var cors = require('cors')
 
 // import routes
-// const workoutRoutes = require("./routes/workouts")
+const workoutRoutes = require("./routes/workouts")
 const adminRoutes = require('./routes/api/admin')
 const consultantRoutes = require('./routes/api/consultant')
 const doctorRoutes = require('./routes/api/doctor')
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 })
 
 // routes
-// app.use('/api/workouts/', workoutRoutes)
+app.use('/api/workouts', workoutRoutes)
 app.use('/api/admin/', adminRoutes)
 app.use('/api/consultant/', consultantRoutes)
 app.use('/api/doctor/', doctorRoutes)
