@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const Leave = require('./Leave');
-const Doctor = require('./Doctor');
+const Leave = require('./leaveModel');
+const Doctor = require('./doctorModel');
 
 const Schema = mongoose.Schema;
 

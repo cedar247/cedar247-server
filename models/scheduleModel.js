@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const ShiftOfASchedule = require('./ShiftOfASchedule')
+const ShiftOfASchedule = require('./shiftOfAScheduleModel')
 const Ward = require('./Ward')
 
 const Schema = mongoose.Schema;
