@@ -1,18 +1,22 @@
 const mongoose = require("mongoose");
-const ShiftOfASchedule = require('./shiftOfAScheduleModel')
-const Ward = require('./Ward')
 
 const Schema = mongoose.Schema;
 
 const scheduleModel = new Schema(
     {
-        data: [ShiftOfASchedule],
+        data: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref : 'ShiftOfASchedule'
+            }
+        ],
         dateTime: {
             type: date,
             required: true,
         }
         ward: {
-            type: Ward,
+            type: mongoose.Schema.Types.ObjectId,
+            ref : 'Ward'
             required: true,
         }
         status: {

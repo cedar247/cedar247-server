@@ -1,44 +1,50 @@
 const Doctor = require("../models/doctorModel");
 const mongoose = require("mongoose");
 
-// get all Doctors
+// get all doctor
 const getDoctors = async (req, res) => {
-    const workouts = await Doctor.find({}).sort({ createdAt: -1 });
+    const doctors = await Doctor.find({}).sort({ createdAt: -1 });
 
-    res.status(200).json(workouts);
+    res.status(200).json(doctors);
 };
 
-// get a single workout
-const getWorkout = async (req, res) => {
+// get a single doctor
+const getDoctor = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: "No such workout" });
+        return res.status(404).json({ error: "No such doctor" });
     }
 
-    const workout = await Workout.findById(id);
+    const doctor = await Doctor.findById(id);
 
-    if (!workout) {
-        return res.status(404).json({ error: "No such workout" });
+    if (!doctor) {
+        return res.status(404).json({ error: "No such doctor" });
     }
 
-    res.status(200).json(workout);
+    res.status(200).json(doctor);
 };
 
-// create a new workout
-const createWorkout = async (req, res) => {
-    const { title, load, reps } = req.body;
+// create a new doctor
+const createDoctor = async (req, res) => {
+    const { name, phoneNumber, email, category, WardID } = req.body;
 
     let emptyFields = [];
 
-    if (!title) {
-        emptyFields.push("title");
+    if (!name) {
+        emptyFields.push("name");
     }
-    if (!load) {
-        emptyFields.push("load");
+    if (!phoneNumber) {
+        emptyFields.push("phoneNumber");
     }
-    if (!reps) {
-        emptyFields.push("reps");
+    if (!email) {
+        emptyFields.push("email");
+    }
+    if (!category) {
+        emptyFields.push("category");
+    }
+    if (!WardID) {
+        emptyFields.push("WardID");
     }
     if (emptyFields.length > 0) {
         return res
@@ -48,56 +54,51 @@ const createWorkout = async (req, res) => {
 
     // add to the database
     try {
-        const workout = await Workout.create({ title, load, reps });
-        res.status(200).json(workout);
+        const doctor = await Doctor.create({ name, phoneNumber, email, category, WardID });
+        res.status(200).json(doctor);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
 
-// delete a workout
-const deleteWorkout = async (req, res) => {
+// delete a doctor
+const deleteDoctor = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "No such workout" });
+        return res.status(400).json({ error: "No such doctor" });
     }
 
-    const workout = await Workout.findOneAndDelete({ _id: id });
+    const doctor = await Doctor.findOneAndDelete({ _id: id });
 
-    if (!workout) {
-        return res.status(400).json({ error: "No such workout" });
+    if (!doctor) {
+        return res.status(400).json({ error: "No such doctor" });
     }
 
-    res.status(200).json(workout);
+    res.status(200).json(doctor);
 };
 
-// update a workout
-const updateWorkout = async (req, res) => {
+// update a doctor
+const updateDoctor = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "No such workout" });
+        return res.status(400).json({ error: "No such doctor" });
     }
 
-    const workout = await Workout.findOneAndUpdate(
-        { _id: id },
-        {
-            ...req.body,
-        }
-    );
+    const doctor = await Doctor.findOneAndUpdate({ _id: id },{...req.body,});
 
-    if (!workout) {
-        return res.status(400).json({ error: "No such workout" });
+    if (!doctor) {
+        return res.status(400).json({ error: "No such doctor" });
     }
 
-    res.status(200).json(workout);
+    res.status(200).json(doctor);
 };
 
 module.exports = {
-    getWorkouts,
-    getWorkout,
-    createWorkout,
-    deleteWorkout,
-    updateWorkout,
+    getDoctors,
+    getDoctor,
+    createDoctor,
+    deleteDoctor,
+    updateDoctor,
 };
