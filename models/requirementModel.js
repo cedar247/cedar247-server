@@ -7,13 +7,13 @@ const requirementModel = new Schema(
         doctor: {
             type: mongoose.Schema.type.ObjectId,
             ref: 'Doctor',
-            required: true
+            required: true,
         },
         leaves: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'leave',
-                required:true
+                required:true,
             }
         ],
     },

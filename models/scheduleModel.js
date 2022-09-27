@@ -7,7 +7,7 @@ const scheduleModel = new Schema(
         data: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref : 'ShiftOfASchedule'
+                ref : 'ShiftOfASchedule',
             }
         ],
         dateTime: {
@@ -16,7 +16,7 @@ const scheduleModel = new Schema(
         }
         ward: {
             type: mongoose.Schema.Types.ObjectId,
-            ref : 'Ward'
+            ref : 'Ward',
             required: true,
         }
         status: {
