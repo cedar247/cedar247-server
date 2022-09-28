@@ -13,12 +13,12 @@ const scheduleModel = new Schema(
         dateTime: {
             type: String,
             required: true,
-        }
+        },
         ward: {
             type: mongoose.Schema.Types.ObjectId,
             ref : 'Ward',
             required: true,
-        }
+        },
         status: {
             type: Number,
             required: true,

@@ -8,11 +8,11 @@ const leaveSchema = new Schema({
         required : true
     }
     ,
-    shift:{
-        type : Array,
-        ref : 'Shift'
+    shift:[{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Shift',
         required : true
-    }
+    }]
     
 },{timestamps : true})
 

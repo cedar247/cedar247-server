@@ -122,9 +122,9 @@ const addWard = async (req, res) => {
 const addShift = async (req, res) => {
     console.log("addShifts")
     const shift = {
-        name: morning
-        startTime: "08:00",
-        endTime: "12:00",
+        name: "night",
+        startTime: "19:00",
+        endTime: "08:00",
     } 
 
     try {
@@ -140,7 +140,7 @@ const addLeave = async (req, res) => {
     console.log("addLeaves")
     const leave = {
         date: "2022-10-12",
-        shift: ['',''],         //ids of shifts
+        shift: ['633342d5b7cee2b016919f5e','633489c62018c4ed921a0852','63348a42457add832f5834c9'],         //ids of shifts
     } 
 
     try {
@@ -171,8 +171,8 @@ const addRequirement = async (req, res) => {
 const addShiftOfSchedule = async (req, res) => {
     console.log("addShiftOfSchedule")
     const requirement = {
-        doctor: ""          //id of doctor
-        shift: ""           //id of shift
+        doctor: "id",       //id of doctor
+        shift: ["id"]           //id of shift
     } 
 
     try {

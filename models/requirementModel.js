@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const requirementModel = new Schema(
     {
         doctor: {
-            type: mongoose.Schema.type.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Doctor',
             required: true,
         },

@@ -11,7 +11,13 @@ const {
 const router = express.Router()
 
 //add a new ward
-router.post('/', addWard)
+router.post('/addWard', addWard)
+router.post('/addShift', addShift)
+router.post('/addLeave', addLeave)
+router.post('/addRequirement', addRequirement)
+router.post('/addShiftOfSchedule', addShiftOfSchedule)
+router.post('/addSchedule', addSchedule)
+
 
 
 

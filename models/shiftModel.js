@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const shiftModel = new Schema(
     {
-        name: String
+        name: String,
         startTime: String,
         endTime: String,
 
