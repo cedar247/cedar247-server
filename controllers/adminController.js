@@ -1,6 +1,6 @@
 const Consultant = require('../models/consultantModel')
 const Doctor = require('../models/doctorModel')
-
+const Ward = require('../models/wardModel')
 
 //all consultant 
 const getConsultants = async (req,res)=>{
@@ -16,6 +16,20 @@ const getConsultants = async (req,res)=>{
 }
 
 
+//all consultant 
+
+
+const getWards = async (req,res)=>{
+
+    try{
+    const consultant = await Ward.find({},{name:1}).sort({createdAt:-1})
+
+    res.status(200).json(consultant)
+    }catch(error){
+        res.status(400).json({msg: error.message})
+    }
+
+}
 //create consultant
 
 const CreateConsultant = async (req,res)=>{
@@ -67,4 +81,4 @@ const getConsultant = async (req,res)=>{
 module.exports =  {CreateConsultant,
     getConsultants,
     getConsultant,
-    CreateDoctor}
+    CreateDoctor,getWards}
