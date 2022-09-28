@@ -1,27 +1,34 @@
 const express = require('express')
 const {
-    createWorkout,
-    getWorkout,
-    getWorkouts,
-    deleteWorkout,
-    updateWorkout
+    addWard,
+    addShift,
+    addLeave,
+    addRequirement,
+    addShiftOfSchedule,
+    addSchedule
 } = require('../controllers/workoutController')
 
 const router = express.Router()
 
-router.get('/', getWorkouts)
+//add a new ward
+router.post('/', addWard)
 
 
-// GET a single workout
-router.get('/:id', getWorkout)
+
+
+// router.get('/', getWorkouts)
+
+
+// // GET a single workout
+// router.get('/:id', getWorkout)
 
 // POST a new workout
-router.post('/', createWorkout)
+// router.post('/', createWorkout)
 
-// DELETE a workout
-router.delete('/:id', deleteWorkout)
+// // DELETE a workout
+// router.delete('/:id', deleteWorkout)
 
-// UPDATE a workout
-router.patch('/:id', updateWorkout)
+// // UPDATE a workout
+// router.patch('/:id', updateWorkout)
 
 module.exports = router

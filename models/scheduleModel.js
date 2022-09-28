@@ -11,7 +11,7 @@ const scheduleModel = new Schema(
             }
         ],
         dateTime: {
-            type: date,
+            type: String,
             required: true,
         }
         ward: {

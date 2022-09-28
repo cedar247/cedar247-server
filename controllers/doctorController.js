@@ -26,4 +26,5 @@ const changePassword = async (req, res) => {
 module.exports = {
     defineRequirements,
     changeClendar,
+    changePassword
 };
