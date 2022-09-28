@@ -12,6 +12,9 @@ router
 router
     .post('/changeClendar',changeClendar)
 
+router
+    .post('/changePassword',changeClendar)
+
 
 
 module.exports = router

@@ -15,6 +15,14 @@ const changeClendar = async (req, res) => {
 
 }
 
+const changePassword = async (req, res) => {
+    console.log("data recieved");
+    const data = req.body;
+
+    console.log(data);
+
+};
+
 module.exports = {
     defineRequirements,
     changeClendar,
