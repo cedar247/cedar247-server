@@ -140,7 +140,7 @@ const addLeave = async (req, res) => {
     console.log("addLeaves")
     const leave = {
         date: "2022-10-12",
-        shift: ['633342d5b7cee2b016919f5e','633489c62018c4ed921a0852','63348a42457add832f5834c9'],         //ids of shifts
+        shift: ["633342d5b7cee2b016919f5e","633489c62018c4ed921a0852","63348a42457add832f5834c9"],         //ids of shifts
     } 
 
     try {
@@ -171,8 +171,9 @@ const addRequirement = async (req, res) => {
 const addShiftOfSchedule = async (req, res) => {
     console.log("addShiftOfSchedule")
     const requirement = {
-        doctor: "id",       //id of doctor
-        shift: ["id"]           //id of shift
+        doctors: ["6334064ed5d1332a578a8f93"],       //id of doctor 6334064ed5d1332a578a8f93
+        shift: "633342d5b7cee2b016919f5e",          //id of shift
+        date: "2022-10-14"         
     } 
 
     try {
@@ -187,10 +188,19 @@ const addShiftOfSchedule = async (req, res) => {
 const addSchedule = async (req, res) => {
     console.log("addSchedule")
     const requirement = {
-        data: ['','',''],           //ids of shift of schedules
-        dateTime: "2022-10-12",     
-        ward: "",                   //id of ward
-        status: "",                 //number
+        data: ['6335131e52805a45a9dc8c8b',
+                '633513df23c4a5f21454cd65',
+                '6335147c8e748a4ec4752f71',
+                '633514c7e91d54b55b9674f0',
+                '633514fb4d7fe297db6bcd37',
+                '63351516df919f17849a6d85',
+                '63351848411c98937814cd96',
+                '633518a984f984baa027a7c2',
+                '633518fe88caa1f4cc6d3107',
+                '6335194d6a09a6c8e43832ed'],           //ids of shift of schedules
+        dateTime: "2022-10",     
+        ward: "63334d2d9cf9da47b11280a0",                   //id of ward
+        status: 1,                 //number
     } 
 
     try {

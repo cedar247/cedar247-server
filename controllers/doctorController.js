@@ -13,7 +13,7 @@ const defineRequirements = async (req, res) => {
     console.log(data);
 
     const {id,date,morning,evening,night} = req.body
-    // const _id ='6333455ab7cee2b016919f60';
+    // const _id ='6334249bebcfbf785191df1d';
     const doctor = await Doctor.findById({_id: id});
     const ward = await Ward.findById(doctor["WardID"]);
 
@@ -57,11 +57,92 @@ const defineRequirements = async (req, res) => {
 
 
 const changeClendar = async (req, res) => {
+
+    const {id,allawAllDoctors} = req.body;
+    const appointments = [];
+    const owners = [];
+    const colors = ['#7E57C2', '#FF7043', '#E91E63', '#E91E63', '#AB47BC', '#FFA726'];
+    
     console.log("data recieved");
     const data = req.body;
-
     console.log(data);
-    res.status(200).json([]);
+
+    // const _id ='6334249bebcfbf785191df1d';
+    const doctor = await Doctor.findById({_id: id});
+    const ward = await Ward.findById(doctor["WardID"]);
+    const Schedules = await Schedule.find(doctor["WardID"]);
+
+    const allshifts = {}
+    for(let i = 0; i < ward["shifts"].length; i++) {
+
+        shiftDetails = await Shift.findById(ward["shifts"][i]);
+        allshifts[ward["shifts"][i]] = shiftDetails;
+    }
+    // console.log(allshifts);
+
+    const alldoctors = {}
+    for(let i = 0; i < ward["doctors"].length; i++) {
+
+        doctorDetails = await Doctor.findById(ward["doctors"][i]);
+        alldoctors[ward["doctors"][i]] = owners.length+1;
+        owners.push({
+            text: doctorDetails["name"],
+            id: i,
+            color: colors[i%6]
+        })
+    }
+    console.log(owners);
+    // console.log(alldoctors);
+
+    // console.log(Schedules);
+    for(let i = 0; i < Schedules.length; i++) {
+
+    const shiftOfSchedules = [];
+    // console.log(Schedules[i]["data"]);
+    
+        for(let j = 0; j < Schedules[i]["data"].length; j++) {
+            // console.log(Schedules[i]["data"][j]);
+
+            const shiftOfSchedule = await ShiftOfASchedule.findById(Schedules[i]["data"][j]);
+            // console.log(shiftOfSchedule);
+
+            const shiftInSchedule = allshifts[shiftOfSchedule["shift"]];
+
+            const doctorsInShift = [];
+            // console.log(Number(date[0]))
+
+            for(let k = 0; k < shiftOfSchedule["doctors"].length; k++) {
+                // console.log(shiftOfSchedule["doctors"][k]);
+
+                doctorsInShift.push(alldoctors[shiftOfSchedule["doctors"][k]]);
+                // console.log(doctorInSchedule);
+
+            }
+            
+            appointments.push(
+                {
+                    title : shiftInSchedule["name"],
+                    date: shiftOfSchedule["date"],
+                    startTime: shiftInSchedule["startTime"],
+                    endTime: shiftInSchedule["endTime"],
+                    id: appointments.length,
+                    doctors: doctorsInShift
+                } 
+            );
+
+        }
+
+        console.log(appointments);
+    }
+
+    const resourcesData = [ {
+        fieldName: 'doctors',
+        title: 'Doctor',
+        instances: owners,
+        }]
+
+    console.log("done");
+    res.status(200).json([appointments, resourcesData]);
 };
 
 const changePassword = async (req, res) => {
