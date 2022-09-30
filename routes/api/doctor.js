@@ -1,7 +1,8 @@
 const express = require('express')
 const {
     defineRequirements,
-    changeClendar
+    changeClendar,
+    changePassword,
 } = require('../../controllers/doctorController')
 
 const router = express.Router()
@@ -13,7 +14,7 @@ router
     .post('/changeClendar',changeClendar)
 
 router
-    .post('/changePassword',changeClendar)
+    .post('/changePassword',changePassword)
 
 
 

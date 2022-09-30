@@ -1,4 +1,5 @@
 const request = require('request');
+const User = require('../models/userModel')
 const Doctor = require('../models/doctorModel')
 const Ward = require('../models/wardModel')
 const Leave = require('../models/leaveModel')
@@ -146,8 +147,27 @@ const changeClendar = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
+
     console.log("data recieved");
     const data = req.body;
+    // const _id ='6334249bebcfbf785191df1d';
+    const updateFields = {
+        email: data["email"],
+        password:data["password"]
+    }
+    console.log(updateFields)
+
+    const doctor = await Doctor.findById({_id:data["id"]});
+    console.log(doctor)
+
+
+    const updateDoctor = await User.findOneAndUpdate({_id: doctor["userId"]}, updateFields)
+    console.log(updateDoctor)
+
+    if (!updateDoctor) {
+                return res.status(404).json({error: 'No such workout'})
+            }
+            res.status(200).json(updateDoctor)
 
     console.log(data);
 };
