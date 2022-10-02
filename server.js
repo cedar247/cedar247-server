@@ -31,6 +31,7 @@ app.use((req, res, next) => {
 })
 
 // routes
+
 app.use('/api/workouts', workoutRoutes)
 app.use('/api/admin/', adminRoutes)
 app.use('/api/consultant/', consultantRoutes)

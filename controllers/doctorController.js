@@ -1,104 +1,197 @@
-const Doctor = require("../models/doctorModel");
-const mongoose = require("mongoose");
+const request = require('request');
+const User = require('../models/userModel')
+const Doctor = require('../models/doctorModel')
+const Ward = require('../models/wardModel')
+const Leave = require('../models/leaveModel')
+const Shift = require('../models/shiftModel')
+const Requirement = require('../models/requirementModel')
+const ShiftOfASchedule = require('../models/shiftOfAScheduleModel')
+const Schedule = require('../models/scheduleModel')
 
-// get all doctor
-const getDoctors = async (req, res) => {
-    const doctors = await Doctor.find({}).sort({ createdAt: -1 });
+const defineRequirements = async (req, res) => {
+    console.log("data recieved");
+    const data = req.body;
+    console.log(data);
 
-    res.status(200).json(doctors);
+    const {id,date,morning,evening,night} = req.body
+    // const _id ='6334249bebcfbf785191df1d';
+    const doctor = await Doctor.findById({_id: id});
+    const ward = await Ward.findById(doctor["WardID"]);
+
+    const shifts = ward["shifts"];
+
+    const leavedshifts = [];
+    for(let i = 0; i < shifts.length; i++) {
+
+        shiftDetails = await Shift.findById(shifts[i]);
+
+        if(morning && shiftDetails["name"] == "morning" ){
+            leavedshifts.push(shiftDetails["_id"].toString());
+
+        }if(evening && shiftDetails["name"] == "evening" ){
+            leavedshifts.push(shiftDetails["_id"].toString());
+
+        }if(night && shiftDetails["name"] == "night" ){
+            leavedshifts.push(shiftDetails["_id"].toString());
+        }
+    }
+
+    const leave = {
+        date: date,
+        shift: leavedshifts,
+    }
+
+    const newleave = await Leave.create(leave);
+
+    const requiredLeaves = [];
+    requiredLeaves.push(newleave["_id"].toString());
+
+    const requirement = {
+        doctor: id,
+        leaves: requiredLeaves,
+    }
+
+    const newRequirement = await Requirement.create(requirement);
+    
+    res.status(200).json(newRequirement);
 };
 
-// get a single doctor
-const getDoctor = async (req, res) => {
-    const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: "No such doctor" });
+const changeClendar = async (req, res) => {
+
+    const {id,showAllDoctors} = req.body;
+    const appointments = [];
+    const owners = [];
+    const colors = ['#7E57C2', '#FF7043', '#E91E63', '#E91E63', '#AB47BC', '#FFA726'];
+    
+    console.log("data recieved");
+    const data = req.body;
+    console.log(data);
+
+    // const _id ='6334249bebcfbf785191df1d';
+    const doctor = await Doctor.findById({_id: id});
+    const ward = await Ward.findById(doctor["WardID"]);
+    const Schedules = await Schedule.find(doctor["WardID"]);
+
+    const allshifts = {}
+    for(let i = 0; i < ward["shifts"].length; i++) {
+
+        shiftDetails = await Shift.findById(ward["shifts"][i]);
+        allshifts[ward["shifts"][i]] = shiftDetails;
+    }
+    // console.log(allshifts);
+
+    const alldoctors = {}
+    for(let i = 0; i < ward["doctors"].length; i++) {
+
+        doctorDetails = await Doctor.findById(ward["doctors"][i]);
+        alldoctors[ward["doctors"][i]] = i+1;
+        owners.push({
+            text: doctorDetails["name"],
+            id: i+1,
+            color: colors[i%6]
+        })
+    }
+    // console.log(owners);
+    // console.log(alldoctors);
+
+    // console.log(Schedules);
+    for(let i = 0; i < Schedules.length; i++) {
+
+    const shiftOfSchedules = [];
+    // console.log(Schedules[i]["data"]);
+    
+        for(let j = 0; j < Schedules[i]["data"].length; j++) {
+            // console.log(Schedules[i]["data"][j]);
+
+            const shiftOfSchedule = await ShiftOfASchedule.findById(Schedules[i]["data"][j]);
+            // console.log(shiftOfSchedule);
+
+            const shiftInSchedule = allshifts[shiftOfSchedule["shift"]];
+
+            const doctorsInShift = [];
+            // console.log(Number(date[0]))
+
+            if (showAllDoctors == false) {
+                
+                if(shiftOfSchedule["doctors"].includes(id)){
+                    console.log("true");
+                    doctorsInShift.push(alldoctors[id])
+
+                    appointments.push(
+                        {
+                            title : shiftInSchedule["name"],
+                            date: shiftOfSchedule["date"],
+                            startTime: shiftInSchedule["startTime"],
+                            endTime: shiftInSchedule["endTime"],
+                            id: appointments.length,
+                            doctors: doctorsInShift
+                        } 
+                    );
+
+                }
+
+            }else{
+
+                for(let k = 0; k < shiftOfSchedule["doctors"].length; k++) {
+                    // console.log(shiftOfSchedule["doctors"][k]);
+
+                    doctorsInShift.push(alldoctors[shiftOfSchedule["doctors"][k]]);
+                    // console.log(doctorsInShift);
+
+                }
+                appointments.push(
+                    {
+                        title : shiftInSchedule["name"],
+                        date: shiftOfSchedule["date"],
+                        startTime: shiftInSchedule["startTime"],
+                        endTime: shiftInSchedule["endTime"],
+                        id: appointments.length,
+                        doctors: doctorsInShift
+                    } 
+                );
+            }
+            
+
+
+        }
+
+        // console.log(appointments);
     }
 
-    const doctor = await Doctor.findById(id);
-
-    if (!doctor) {
-        return res.status(404).json({ error: "No such doctor" });
-    }
-
-    res.status(200).json(doctor);
+    console.log("done");
+    res.status(200).json([appointments, owners]);
 };
 
-// create a new doctor
-const createDoctor = async (req, res) => {
-    const { name, phoneNumber, email, category, WardID } = req.body;
+const changePassword = async (req, res) => {
 
-    let emptyFields = [];
-
-    if (!name) {
-        emptyFields.push("name");
+    console.log("data recieved");
+    const data = req.body;
+    // const _id ='6334249bebcfbf785191df1d';
+    const updateFields = {
+        email: data["email"],
+        password:data["password"]
     }
-    if (!phoneNumber) {
-        emptyFields.push("phoneNumber");
-    }
-    if (!email) {
-        emptyFields.push("email");
-    }
-    if (!category) {
-        emptyFields.push("category");
-    }
-    if (!WardID) {
-        emptyFields.push("WardID");
-    }
-    if (emptyFields.length > 0) {
-        return res
-            .status(400)
-            .json({ error: "Please fill in all fields", emptyFields });
-    }
+    console.log(updateFields)
 
-    // add to the database
-    try {
-        const doctor = await Doctor.create({ name, phoneNumber, email, category, WardID });
-        res.status(200).json(doctor);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
+    const doctor = await Doctor.findById({_id:data["id"]});
+    console.log(doctor)
 
-// delete a doctor
-const deleteDoctor = async (req, res) => {
-    const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "No such doctor" });
-    }
+    const updateDoctor = await User.findOneAndUpdate({_id: doctor["userId"]}, updateFields)
+    console.log(updateDoctor)
 
-    const doctor = await Doctor.findOneAndDelete({ _id: id });
+    if (!updateDoctor) {
+                return res.status(404).json({error: 'No such workout'})
+            }
+            res.status(200).json(updateDoctor)
 
-    if (!doctor) {
-        return res.status(400).json({ error: "No such doctor" });
-    }
-
-    res.status(200).json(doctor);
-};
-
-// update a doctor
-const updateDoctor = async (req, res) => {
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "No such doctor" });
-    }
-
-    const doctor = await Doctor.findOneAndUpdate({ _id: id },{...req.body,});
-
-    if (!doctor) {
-        return res.status(400).json({ error: "No such doctor" });
-    }
-
-    res.status(200).json(doctor);
+    console.log(data);
 };
 
 module.exports = {
-    getDoctors,
-    getDoctor,
-    createDoctor,
-    deleteDoctor,
-    updateDoctor,
+    defineRequirements,
+    changeClendar,
+    changePassword,
 };
+    

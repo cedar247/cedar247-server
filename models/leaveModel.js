@@ -4,14 +4,15 @@ const Schema = mongoose.Schema
 
 const leaveSchema = new Schema({
     date:{
-        type : Date,
+        type : String,
         required : true
     }
     ,
-    shift:{
-        type : Array,
+    shift:[{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Shift',
         required : true
-    }
+    }]
     
 },{timestamps : true})
 

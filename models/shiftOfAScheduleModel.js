@@ -5,12 +5,17 @@ const Schema = mongoose.Schema
 const shiftOfAScheduleSchema = new Schema({
     doctors: [{
         type: mongoose.Schema.Types.ObjectId,
-        required: true
+        required: true,
     }],
     shift: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
+    },
+    date: {
+        type: String,
+        required: true
     }
+
 }, { timestamps: true })
 
 
