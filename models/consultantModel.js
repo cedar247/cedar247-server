@@ -9,7 +9,7 @@ const ConsultantSchema = new Schema({
     }
     ,
     phoneNumber:{
-        type : Array,
+        type : String,
         required : true
     }
     ,

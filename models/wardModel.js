@@ -21,7 +21,6 @@ const wardSchema = new Schema({
     constraints: {
         maxLeaves: {
             type: Number,
-            required: true
         },
         numConsecutiveGroupShifts: {
             type: Number
@@ -52,7 +51,11 @@ const wardSchema = new Schema({
     consultants: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Consultant'
-    }]
+    }],
+    currentScheduleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Schedule'
+    }
 }, { timestamps: true })
 
 

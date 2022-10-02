@@ -6,6 +6,7 @@ const {
     addRequirement,
     addShiftOfSchedule,
     addSchedule
+
 } = require('../controllers/workoutController')
 
 const router = express.Router()
@@ -29,6 +30,14 @@ router.post('/addSchedule', addSchedule)
 // router.get('/:id', getWorkout)
 
 // POST a new workout
+// router.get('/', getWorkouts)
+
+
+// // GET a single workout
+// router.get('/:id', getWorkout)
+
+// // POST a new workout
+
 // router.post('/', createWorkout)
 
 // // DELETE a workout
@@ -36,5 +45,8 @@ router.post('/addSchedule', addSchedule)
 
 // // UPDATE a workout
 // router.patch('/:id', updateWorkout)
+
+
+router.get('/add-ward', addWard)
 
 module.exports = router

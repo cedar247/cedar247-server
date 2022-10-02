@@ -1,16 +1,32 @@
 const express = require('express')
 const{CreateConsultant,
     getConsultants,
-    getConsultant} = require('../../controllers/adminController')
+    getConsultant,
+    CreateDoctor, 
+    getWards,
+    addWard,
+    getShifts,
+    getAllWardDetails
+} = require('../../controllers/adminController')
+
 
 const router = express.Router()
 
 
 
-router.get('/',getConsultants)
-router.get('/:id',getConsultant)
+router.get('/getConsultants',getConsultants)
+
 router.post('/consultant',CreateConsultant)
-router.post('/doctor',CreateConsultant)
+router.post('/doctor',CreateDoctor)
+router.get('/',getWards)
+router.post('/add-ward', addWard)
+// router.get('/get-shifts/:wardId', getShifts)
+router.get('/get-shifts', getShifts)
+router.get('/getAll',getAllWardDetails)
+router.get('/:id',getConsultant)
+
+
+
 
 router.delete('/:id',(req,res)=>{
 
