@@ -6,7 +6,7 @@ const{CreateConsultant,
     getWards,
     addWard,
     getShifts,
-    getConsultant,CreateDoctor, getWards, getAllWardDetails
+    getAllWardDetails
 } = require('../../controllers/adminController')
 
 
