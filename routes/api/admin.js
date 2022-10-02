@@ -1,16 +1,14 @@
 const express = require('express')
 const{CreateConsultant,
     getConsultants,
-<<<<<<< HEAD
     getConsultant,
     CreateDoctor, 
     getWards,
     addWard,
-    getShifts
+    getShifts,
+    getConsultant,CreateDoctor, getWards, getAllWardDetails
 } = require('../../controllers/adminController')
-=======
-    getConsultant,CreateDoctor, getWards, getAllWardDetails} = require('../../controllers/adminController')
->>>>>>> dc74f59 (new changes)
+
 
 const router = express.Router()
 
