@@ -25,6 +25,12 @@ const DoctorSchema = new Schema({
     ,
     WardID:{
         type : Schema.Types.ObjectId,
+        ref: 'ward',
+        required : true
+    },
+    userId:{
+        type : Schema.Types.ObjectId,
+        ref: 'user',
         required : true
     }
     

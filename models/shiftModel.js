@@ -4,10 +4,9 @@ const Schema = mongoose.Schema;
 
 const shiftModel = new Schema(
     {
-        name: "String",
-        startTime: "String",
-        endTime: "String",
-
+        name: String,
+        startTime: String,
+        endTime: String,
     },
     { timestamps: true }
 );

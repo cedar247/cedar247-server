@@ -5,8 +5,10 @@ const{CreateConsultant,
     CreateDoctor, 
     getWards,
     addWard,
-    getShifts
+    getShifts,
+    getAllWardDetails
 } = require('../../controllers/adminController')
+
 
 const router = express.Router()
 
@@ -20,7 +22,11 @@ router.get('/',getWards)
 router.post('/add-ward', addWard)
 // router.get('/get-shifts/:wardId', getShifts)
 router.get('/get-shifts', getShifts)
+router.get('/getAll',getAllWardDetails)
 router.get('/:id',getConsultant)
+
+
+
 
 router.delete('/:id',(req,res)=>{
 

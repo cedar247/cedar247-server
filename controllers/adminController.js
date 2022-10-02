@@ -32,6 +32,19 @@ const getWards = async (req,res)=>{
     }
 
 }
+
+
+const getAllWardDetails = async (req,res)=>{
+
+    try{
+    const consultant = await Ward.find({},{name:1}).sort({})
+
+    res.status(200).json(consultant)
+    }catch(error){
+        res.status(400).json({msg: error.message})
+    }
+
+}
 //create consultant
 
 const CreateConsultant = async (req,res)=>{
@@ -160,5 +173,7 @@ module.exports =  {
     CreateDoctor,
     getWards,
     addWard,
-    getShifts
+    getShifts,
+    getAllWardDetails
+
 }

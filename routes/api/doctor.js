@@ -1,28 +1,21 @@
 const express = require('express')
 const {
-    getDoctors,
-    getDoctor,
-    createDoctor,
-    deleteDoctor,
-    updateDoctor,
+    defineRequirements,
+    changeClendar,
+    changePassword,
 } = require('../../controllers/doctorController')
 
 const router = express.Router()
 
-// GET all workouts
-router.get("/", getDoctors);
+router
+    .post('/defineRequirements',defineRequirements)
 
-// GET a single workout
-router.get("/:id", getDoctor);
+router
+    .post('/changeClendar',changeClendar)
 
-// POST a new workout
-router.post("/", createDoctor);
+router
+    .post('/changePassword',changePassword)
 
-// DELETE a workout
-router.delete("/:id", deleteDoctor);
-
-// UPDATE a workout
-router.patch("/:id", updateDoctor);
 
 
 module.exports = router
