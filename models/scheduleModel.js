@@ -12,7 +12,7 @@ const scheduleModel = new Schema(
         ],
 
         year: Number,
-        month: String,
+        month: Number,
         deadline: {
             type: String
         },
