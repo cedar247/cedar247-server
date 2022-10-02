@@ -2,6 +2,7 @@ const request = require('request');
 const Doctor = require('../models/doctorModel')
 const Ward = require('../models/wardModel')
 const mongoose = require('mongoose')
+const Schedule = require('../models/scheduleModel')
 
 const createSchedule = async (req, res) => {
     request('http://127.0.0.1:5000/schedule', function (error, response, body) {
@@ -13,18 +14,36 @@ const createSchedule = async (req, res) => {
 }
 
 const setDeadline = async (req, res) => {
-  console.log("got data")
   const data = req.body
+  const year = data.year;
+  const month = data.month;
+  const deadline = data.deadline;
+  const wardId = '6338771f6b128f6cfffef6b3'
+  
+  if (!mongoose.Types.ObjectId.isValid(wardId)) {
+    return res.status(404).json({error: "No such ward"})
+  }
+  
+  const ward = await Ward.findById(wardId)
 
-  console.log(data)
-  // add doc to database
-  // try {
-  //     const workout = await Workout.create({title, load, reps})
-  //     res.status(200).json(workout)
-  // } catch (error) {
-  //     res.status(400).json({error: error.message})
-  // }
-  // res.json({msg: 'POST a new workout'})
+  if(!ward) {
+      return res.status(404).json({error: "No such ward"})
+  }
+
+  try {
+    const schedule = await Schedule.create({
+      year: year,
+      month: month,
+      deadline: deadline,
+      ward: wardId,
+      status: 0
+    });
+    const scheduleId = schedule._id;
+    
+    console.log(schedule);
+  } catch (error) {
+    return res.status(400).json({error: error.message})
+  }
 }
 
 const getDoctors = async (req, res) => {
@@ -55,8 +74,27 @@ const getDoctors = async (req, res) => {
   res.status(200).json(newDoctors);
 }
 
+const getDoctorCategories = async (req, res) => {
+  const wardId = '6338771f6b128f6cfffef6b3';
+
+  if (!mongoose.Types.ObjectId.isValid(wardId)) {
+    return res.status(404).json({error: "No such ward"})
+  }
+
+  const ward = await Ward.findById(wardId)
+
+  if(!ward) {
+      return res.status(404).json({error: "No such ward"})
+  }
+
+  const doctorCategories = ward.doctorCategories;
+
+  return res.status(200).json(doctorCategories);
+}
+
 module.exports = {
   setDeadline,
   createSchedule,
-  getDoctors
+  getDoctors,
+  getDoctorCategories
 }

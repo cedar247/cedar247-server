@@ -10,15 +10,18 @@ const scheduleModel = new Schema(
                 ref : 'ShiftOfASchedule',
             }
         ],
-        dateTime: {
-            type: date,
-            required: true,
-        }
+        year: Number,
+        month: String,
+        deadline: {
+            type: String
+        },
         ward: {
             type: mongoose.Schema.Types.ObjectId,
             ref : 'Ward',
             required: true,
-        }
+        },
+        doctorRequirements: [ mongoose.Schema.Types.ObjectId ],
+        consultantRequirements: [ mongoose.Schema.Types.ObjectId ],
         status: {
             type: Number,
             required: true,
