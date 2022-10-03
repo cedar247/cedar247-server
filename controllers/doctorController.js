@@ -8,6 +8,7 @@ const Shift = require("../models/shiftModel");
 const Requirement = require("../models/requirementModel");
 const ShiftOfASchedule = require("../models/shiftOfAScheduleModel");
 const Schedule = require("../models/scheduleModel");
+const bcrypt = require('bcrypt');
 
 //defined the user requirements 
 const defineRequirements = async (req, res) => {
@@ -16,8 +17,8 @@ const defineRequirements = async (req, res) => {
     console.log(data);
 
     const { id, date, morning, evening, night } = req.body;
-    // const _id ='6334249bebcfbf785191df1d';
-
+    // const _id ='633ab0f123be88c950fb8a89';
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ error: "Invalid user" });
     }
@@ -58,6 +59,9 @@ const defineRequirements = async (req, res) => {
         shift: leavedshifts,
     };
     
+    const session = await Requirement.startSession();
+    session.startTransaction();
+
     try {
         const newleave = await Leave.create(leave);
         const requiredLeaves = [];
@@ -94,7 +98,7 @@ const changeClendar = async (req, res) => {
     const data = req.body;
     console.log(data);
 
-    // const _id ='6334249bebcfbf785191df1d';
+    // const _id ='633ab0f123be88c950fb8a89';
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ error: "Invalid user" });
@@ -124,6 +128,7 @@ const changeClendar = async (req, res) => {
         }
         allshifts[ward["shifts"][i]] = shiftDetails;
     }
+    // console.log(allshifts);
 
     const alldoctors = {};
     for (let i = 0; i < ward["doctors"].length; i++) {
@@ -153,6 +158,7 @@ const changeClendar = async (req, res) => {
 
             const shiftInSchedule = allshifts[shiftOfSchedule["shift"]];
             const doctorsInShift = [];
+            // console.log(shiftInSchedule.toString());
 
             if (showAllDoctors == false) {
                 if (shiftOfSchedule["doctors"].includes(id)) {
@@ -195,10 +201,13 @@ const changePassword = async (req, res) => {
     console.log("data recieved");
     const data = req.body;
     console.log(data);
-    const id ='6334249bebcfbf785191df1d';
+    const id ='633ab0f123be88c950fb8a89';
+
+    const hashedPassword = bcrypt.hashSync(data["password"],9);
+    console.log(hashedPassword)
     const updateFields = {
         email: data["email"],
-        password: data["password"],
+        password: hashedPassword,
     };
     console.log(updateFields);
 
