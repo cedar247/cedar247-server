@@ -110,12 +110,10 @@ const addWard = async (req, res) => {
             name: name,
             number: number,
             shifts: shiftIds,
-            doctorCategories: categories,
+            doctorCategories: categories
         })
         const wardCreated = await Ward.create(ward)
-        session.wardId = wardCreated._id;
-        console.log(req.session)
-        session.id  = 1
+        console.log(wardCreated)
         res.status(201).json({msg: "succcess"})
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -127,7 +125,7 @@ const getShifts = async (req, res) => {
     // const { wardId } = req.params;
     const session = req.session;
     // const wardId = session.wardId;
-    const wardId = '6338771f6b128f6cfffef6b3';
+    const wardId = '6339cfeed189aaa0727ebbf1';
     
     if (!mongoose.Types.ObjectId.isValid(wardId)) {
         return res.status(404).json({error: "No such ward"})
