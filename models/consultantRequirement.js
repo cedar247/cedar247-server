@@ -3,16 +3,15 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const ConsultantRequirementSchema = new Schema({
-    ShiftID:{
+    shiftId:{
         type : Schema.Types.ObjectId,
         required : true
     }, 
-    details: [
-        {
-            category: String,
-            numOfDoctors: Number
-        }
-    ]    
+    seniorRegistrar: Number,
+    registrar: Number,
+    seniorHomeOfficer: Number,
+    homeOfficer: Number,
+    medicalOfficer: Number   
 },{timestamps : true})
 
 module.exports = mongoose.model('consultantRequirement',ConsultantRequirementSchema)
