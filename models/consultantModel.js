@@ -22,7 +22,12 @@ const ConsultantSchema = new Schema({
         type : Schema.Types.ObjectId,
         required : true
     }
-    
-},{timestamps : true})
+    ,
+    userId:{
+        type : Schema.Types.ObjectId,
+        ref: 'users',
+        required : true
+    }
 
+},{timestamps : true})
 module.exports = mongoose.model('consultant',ConsultantSchema)

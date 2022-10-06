@@ -15,7 +15,8 @@ const DoctorSchema = new Schema({
     ,
     email:{
         type : String,
-        required : true
+        required : true,
+        unique: true
     }
     ,
     category:{
@@ -30,7 +31,7 @@ const DoctorSchema = new Schema({
     },
     userId:{
         type : Schema.Types.ObjectId,
-        ref: 'user',
+        ref: 'users',
         required : true
     }
     
