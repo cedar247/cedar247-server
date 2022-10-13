@@ -189,9 +189,51 @@ const changePassword = async (req, res) => {
     console.log(data);
 };
 
+//get the shifts belong to the ward of doctor
+const getShifts = async (req, res) => {
+
+    const id = '633ab0f123be88c950fb8a89'
+    const wardId = '6338771f6b128f6cfffef6b3';
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ error: "Invalid user" });
+    }
+    //get the doctor details according to the id
+    const doctor = await Doctor.findById({ _id: id });
+    if(!doctor) {
+        return res.status(404).json({error: "Invalid user"})
+    }
+    //get the ward which is doctor belongs
+    const ward = await Ward.findById(doctor["WardID"]);
+    if(!ward) {
+        return res.status(404).json({error: "No ward"})
+    }
+    const shifts = ward.shifts;
+    if (shifts === []) {
+        return res.status(200).json({ msg: "No shifts" })
+    }
+
+    const shiftDetails = [];
+    for (let i = 0; i < shifts.length; i++) {
+        const shiftId = shifts[i]
+        if (!mongoose.Types.ObjectId.isValid(shiftId)) {
+            console.log("No such shift")
+        } else {
+            const shift = await Shift.findById(shiftId)
+            if (!shift) {
+                console.log("No such shift")
+            } else {
+                shiftDetails.push(shift)
+            }
+        }
+    }
+    return res.status(200).json(shiftDetails)
+}
+
 module.exports = {
     defineRequirements,
     changeClendar,
     changePassword,
+    getShifts,
 };
     
