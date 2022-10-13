@@ -224,11 +224,17 @@ const addWard = async (req, res) => {
 
 }
 
+const setConstraints = async (req, res) => {
+    const data = req.body;
+    console.log(data)
+}
+
 const getShifts = async (req, res) => {
     // const { wardId } = req.params;
     const session = req.session;
     // const wardId = session.wardId;
-    const wardId = '6338771f6b128f6cfffef6b3';
+    // const wardId = '6338771f6b128f6cfffef6b3';
+    const wardId = '6339cfeed189aaa0727ebbf1';
 
     if (!mongoose.Types.ObjectId.isValid(wardId)) {
         return res.status(404).json({ error: "No such ward" })
@@ -279,5 +285,5 @@ module.exports = {
     getAllWardDetails,
     getDoctorTypes,
     CreateUser,
-
+    setConstraints
 }
