@@ -7,7 +7,6 @@ const shiftModel = new Schema(
         name: String,
         startTime: String,
         endTime: String,
-
     },
     { timestamps: true }
 );

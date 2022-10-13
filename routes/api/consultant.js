@@ -1,13 +1,18 @@
 const express = require('express')
 const {
-    setDeadline
+    setDeadline,
+    createSchedule,
+    getDoctors,
+    getDoctorCategories
 } = require('../../controllers/consultantController')
 
 const router = express.Router()
 
 router
-    .post('/create-schedule')
+    .post('/create-schedule', createSchedule)
     .post('/set-deadline', setDeadline)
+    .get('/doctors', getDoctors)
+    .get('/get-categories', getDoctorCategories)
 
 
 
