@@ -22,12 +22,12 @@ const defineRequirements = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ error: "Invalid user" });
     }
-
+    //get the doctor details according to the id
     const doctor = await Doctor.findById({ _id: id });
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }
-
+    //get the ward which is doctor belongs
     const ward = await Ward.findById(doctor["WardID"]);
     if(!ward) {
         return res.status(404).json({error: "No ward"})
@@ -36,6 +36,7 @@ const defineRequirements = async (req, res) => {
     const shifts = ward["shifts"];
 
     const leavedshifts = [];
+    //map the data from front end with the leaves schema
     for (let i = 0; i < shifts.length; i++) {
         shiftDetails = await Shift.findById(shifts[i]);
         if(!shiftDetails) {
@@ -58,10 +59,7 @@ const defineRequirements = async (req, res) => {
         date: date,
         shift: leavedshifts,
     };
-    
-    const session = await Requirement.startSession();
-    session.startTransaction();
-
+    //create leave
     try {
         const newleave = await Leave.create(leave);
         const requiredLeaves = [];
@@ -70,7 +68,7 @@ const defineRequirements = async (req, res) => {
             doctor: id,
             leaves: requiredLeaves,
         };
-
+        //create requirement
         const newRequirement = await Requirement.create(requirement);
         res.status(200).json(newRequirement);
     } catch (error) {
@@ -103,22 +101,22 @@ const changeClendar = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ error: "Invalid user" });
     }
-
+    //get the doctor details according to the id
     const doctor = await Doctor.findById({ _id: id });
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }
-
+    //get the ward which is doctor belongs
     const ward = await Ward.findById(doctor["WardID"]);
     if(!ward) {
         return res.status(404).json({error: "No ward"})
     }
-
+    //find schedules which is belong to the ward that we selected
     const Schedules = await Schedule.find(doctor["WardID"]);
     if(!Schedules) {
         return res.status(404).json({error: "No Schedule"})
     }
-
+    //get all shifts from above ward
     const allshifts = {};
     for (let i = 0; i < ward["shifts"].length; i++) {
         shiftDetails = await Shift.findById(ward["shifts"][i]);
@@ -129,7 +127,7 @@ const changeClendar = async (req, res) => {
         allshifts[ward["shifts"][i]] = shiftDetails;
     }
     // console.log(allshifts);
-
+    //get all doctors from above ward
     const alldoctors = {};
     for (let i = 0; i < ward["doctors"].length; i++) {
         doctorDetails = await Doctor.findById(ward["doctors"][i]);
@@ -144,9 +142,10 @@ const changeClendar = async (req, res) => {
             color: colors[i % 6],
         });
     }
-
     for (let i = 0; i < Schedules.length; i++) {
         const shiftOfSchedules = [];
+
+        //get shift of schedules which is belongs to the schedule
         for (let j = 0; j < Schedules[i]["data"].length; j++) {
             const shiftOfSchedule = await ShiftOfASchedule.findById(
                 Schedules[i]["data"][j]
@@ -159,7 +158,7 @@ const changeClendar = async (req, res) => {
             const shiftInSchedule = allshifts[shiftOfSchedule["shift"]];
             const doctorsInShift = [];
             // console.log(shiftInSchedule.toString());
-
+            //if show all doctor is false it get only the appoinments whci is belong to current doctor
             if (showAllDoctors == false) {
                 if (shiftOfSchedule["doctors"].includes(id)) {
                     console.log("true");
@@ -173,7 +172,7 @@ const changeClendar = async (req, res) => {
                         doctors: doctorsInShift,
                     });
                 }
-            } else {
+            } else {             //otherwise it gets all the appoinments according to the doctor
                 for (let k = 0; k < shiftOfSchedule["doctors"].length; k++) {
                     doctorsInShift.push(
                         alldoctors[shiftOfSchedule["doctors"][k]]
@@ -191,7 +190,8 @@ const changeClendar = async (req, res) => {
         }
     }
     console.log("done");
-    console.log(appointments, owners);
+    // console.log(appointments, owners);
+    //return the appoinment and owners list
     res.status(200).json([appointments, owners]);
 };
 
@@ -214,12 +214,14 @@ const changePassword = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ error: "Invalid user" });
     }
+    //get the ward which is doctor belongs
     const doctor = await Doctor.findById({ _id: data["id"] });
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }
     // console.log(doctor);
     try {
+        //find and update the doctos email and the password
         const updateDoctor = await User.findOneAndUpdate(
             { _id: doctor["userId"] },
             updateFields
