@@ -11,6 +11,10 @@ const wardSchema = new Schema({
         type: Number,
         required: true
     },
+    currentScheduleID : {
+        type: Schema.Types.ObjectId,
+        ref: 'Schedule'
+    },
     shifts: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -51,11 +55,7 @@ const wardSchema = new Schema({
     consultants: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Consultant'
-    }],
-    currentScheduleId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Schedule'
-    }
+    }]
 }, { timestamps: true })
 
 

@@ -89,34 +89,6 @@ const mongoose = require('mongoose')
 //     updateWorkout
 // }
 
-const addWard = async (req, res) => {
-    console.log("in addward")
-    const ward = {
-        name: "Cardiothoracic Ward",
-        number: 1,
-        shifts: ['633342d5b7cee2b016919f5e'],
-        doctorCategories: ["Senior Registrar", "Registrar"],
-        constraints: {
-            maxLeaves: 4,
-            numConsecutiveGroupShifts: 0,
-            consecutiveGroups: [
-                []
-            ],
-            specialShifts: [],
-            casualtyDay: "Monday",
-            casualtyDayShifts: ['633342d5b7cee2b016919f5e']
-        },
-        doctors: ['6333455ab7cee2b016919f60'],
-        consultants: ['633346ffb7cee2b016919f62']
-    } 
-
-    try {
-        const ward_created = await Ward.create(ward)
-        res.status(200).json(ward_created)
-    } catch (error) {
-        console(error.message)
-        res.status(400).json({error: error.message})
-const Ward = require('../models/wardModel')
 
 // get all workouts
 const getWorkouts = async (req, res) => {
