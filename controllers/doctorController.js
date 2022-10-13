@@ -16,7 +16,7 @@ const defineRequirements = async (req, res) => {
     const data = req.body;
     console.log(data);
 
-    const { id, date, morning, evening, night } = req.body;
+    const { id, date, shiftTypes } = req.body;
     // const _id ='633ab0f123be88c950fb8a89';
     
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -27,31 +27,17 @@ const defineRequirements = async (req, res) => {
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }
-    //get the ward which is doctor belongs
-    const ward = await Ward.findById(doctor["WardID"]);
-    if(!ward) {
-        return res.status(404).json({error: "No ward"})
-    }
-
-    const shifts = ward["shifts"];
 
     const leavedshifts = [];
     //map the data from front end with the leaves schema
-    for (let i = 0; i < shifts.length; i++) {
-        shiftDetails = await Shift.findById(shifts[i]);
+    for (let i = 0; i < data.length; i++) {
+        shiftDetails = await Shift.findById(shiftTypes[i].id);
         if(!shiftDetails) {
             return res.status(400).json({error: "Invalid shift"})
             break;
         }
-
-        if (morning && shiftDetails["name"] == "morning") {
-            leavedshifts.push(shiftDetails["_id"].toString());
-        }
-        if (evening && shiftDetails["name"] == "evening") {
-            leavedshifts.push(shiftDetails["_id"].toString());
-        }
-        if (night && shiftDetails["name"] == "night") {
-            leavedshifts.push(shiftDetails["_id"].toString());
+        if(shiftTypes[i].checked){
+            leavedshifts.push(shiftTypes[i].id)
         }
     }
 
