@@ -226,7 +226,60 @@ const addWard = async (req, res) => {
 
 const setConstraints = async (req, res) => {
     const data = req.body;
-    console.log(data)
+    const wardId = '6339cfeed189aaa0727ebbf1';
+
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
+        return res.status(404).json({ error: "No such ward" })
+    }
+    
+    const ward = await Ward.findById(wardId)
+
+    if (!ward) {
+        return res.status(404).json({ error: "No such ward" })
+    }
+
+    try {
+        const maxLeaves = parseInt(data.maxLeaves)
+        const numConsecutiveGroupShifts = parseInt(data.numConsecutiveGroupShifts)
+        const specialShifts = []
+
+        // add special shifts to specialShifts
+        for(let i = 0; i < data.shiftTypes.length; i++){
+            if(data.shiftTypes[i].checked === true && data.shiftTypes[i].vacation != 0) {
+                specialShifts.push({
+                    shift: data.shiftTypes[i].id,
+                    vacation: data.shiftTypes[i].vacation
+                })
+            }   
+        }
+
+        const casualtyDay = data.casualtyDay
+        const casualtyDayShifts = []
+
+        // add casualty day shifts to 
+        for(let i = 0; i < data.casualtyDayShifts.length; i++){
+            if(data.casualtyDayShifts[i].checked === true){
+                casualtyDayShifts.push(data.casualtyDayShifts[i].id)
+            }
+        }
+
+        const constraints = {
+            maxLeaves,
+            numConsecutiveGroupShifts,
+            specialShifts,
+            casualtyDay,
+            casualtyDayShifts
+        }
+
+        console.log(constraints)
+        const wardUpdated = await Ward.findOneAndUpdate({_id: wardId}, {
+            constraints
+        });
+
+        return res.status(201).json({msg: "success"})
+    } catch (error) {
+        return res.status(400).json({error: error.message})
+    }
 }
 
 const getShifts = async (req, res) => {
