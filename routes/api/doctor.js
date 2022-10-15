@@ -4,21 +4,20 @@ const {
     changeClendar,
     changePassword,
     getShifts,
+    getDoctorShifts,
 } = require('../../controllers/doctorController')
 
 const router = express.Router()
 
-router
-    .post('/defineRequirements',defineRequirements)
+router.post('/defineRequirements',defineRequirements)
 
-router
-    .post('/changeClendar',changeClendar)
+router.post('/changeClendar',changeClendar)
 
-router
-    .post('/changePassword',changePassword)
+router.post('/changePassword',changePassword)
 
-router
-    .post('/getShifts', getShifts)
+router.post('/getShifts', getShifts)
+
+router.post('/getDoctorShifts', getDoctorShifts)
 
 
 
