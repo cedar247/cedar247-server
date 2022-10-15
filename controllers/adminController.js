@@ -326,6 +326,74 @@ const getShifts = async (req, res) => {
     return res.status(200).json(shiftDetails)
 }
 
+const getNumConsecGroups = async (req, res) => {
+    const wardId = '6339cfeed189aaa0727ebbf1';
+
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
+        return res.status(404).json({ error: "No such ward" })
+    }
+
+    const ward = await Ward.findById(wardId)
+
+    if (!ward) {
+        return res.status(404).json({ error: "No such ward" })
+    }
+
+    try {
+        const numConsecGroups = ward.constraints.numConsecutiveGroupShifts
+
+        if(numConsecGroups) {
+            return res.status(200).json({ numConsecGroups: numConsecGroups })
+        }
+    } catch (error) {
+        return res.status(400).json({error: error.message})
+    }
+
+}
+
+const setConsecGroups = async (req, res) => {
+    const data = req.body;
+    const wardId = '6339cfeed189aaa0727ebbf1';
+
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
+        return res.status(404).json({ error: "No such ward" })
+    }
+
+    const ward = await Ward.findById(wardId)
+
+    if (!ward) {
+        return res.status(404).json({ error: "No such ward" })
+    }
+    try{
+        const consecGroups = []
+        for(let i = 0; i < data.length; i++) {
+            const consecGroup_current = []
+            
+            for(let j = 0; j < data[i].length; j++) {
+                // add checked shifts to consecGroup 
+                if(data[i][j].checked === true) {
+                    consecGroup_current.push(data[i][j].id)
+                }
+                
+            }
+            // add consecutive group to consecutive Groups
+            consecGroups.push(consecGroup_current)
+        }
+        const constraints = ward.constraints;
+        constraints.consecutiveGroups = consecGroups;
+        const wardUpdated = await Ward.findOneAndUpdate({_id: wardId}, {
+            constraints: constraints
+        })
+
+        // console.log(wardUpdated.constraints.consecutiveGroups)
+        return res.status(201).json({msg: "success"})
+    } catch(error) {
+        return res.status(400).json({ error: error.message})
+    }
+
+    
+}
+
 
 module.exports = {
     CreateConsultant,
@@ -338,5 +406,7 @@ module.exports = {
     getAllWardDetails,
     getDoctorTypes,
     CreateUser,
-    setConstraints
+    setConstraints,
+    getNumConsecGroups,
+    setConsecGroups
 }
