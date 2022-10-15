@@ -36,7 +36,7 @@ app.use('/api/admin/', adminRoutes)//admin route
 app.use('/api/consultant/', consultantRoutes)//consultant routes
 app.use('/api/doctor/', doctorRoutes)//doctor routes
 app.use('/api/auth/', authRoutes)//authentication routes
-
+ 
 // connect to db
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
