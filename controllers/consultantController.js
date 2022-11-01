@@ -1,4 +1,5 @@
 const request = require('request');
+const axios = require('axios');
 const Doctor = require('../models/doctorModel')
 const Ward = require('../models/wardModel')
 const mongoose = require('mongoose')
@@ -7,7 +8,7 @@ const consultantRequirement = require('../models/consultantRequirement');
 
 const createSchedule = async (req, res) => {
   const data = req.body;
-  const wardId = '6339cfeed189aaa0727ebbf1'
+  const wardId = '6339cfeed189aaa0727ebbf1' // ward Id
   // console.log(data)
 
   const categoriesBinding = {
@@ -23,17 +24,16 @@ const createSchedule = async (req, res) => {
   }
 
   const ward = await Ward.findById(wardId);
-  // console.log(ward)
 
   if(!ward) {
       return res.status(404).json({error: "No such ward"})
   }
 
-  const scheduleID = ward.currentScheduleID;
+  const scheduleID = ward.currentScheduleID; // get current schedule Id of the ward
 
   const schedule = await Schedule.findById(scheduleID);
 
-  if(!schedule) {
+  if(!schedule) { // check whether the schedule is exists in the database
     return res.status(404).json({error: "No such schedule"})
   }
 
@@ -76,21 +76,40 @@ const createSchedule = async (req, res) => {
         }
       )
 
-      if(scheduleUpdated) {
-        return res.status(201).json({msg: "success"})
+      // doctors' ids
+      const doctorsIds = ward.doctors
+      const doctorCategories = ward.doctorCategories
+
+      // create an object for doctors' details
+      const doctors_details = {}
+
+      // for(let i = 0; i <  )
+      // send schedule data to flask server
+      const data = {
+        name: 'John Doe',
+        job: 'Content Writer'
       }
+      
+      
+      const response = await axios.post('http://localhost:4000/schedule', data)
+      console.log(`Status: ${res.status}`)
+      console.log('Body: ', res.data)
+      
+      // createUser()
+
+      
+
+      // if(scheduleUpdated) {
+      //   return res.status(201).json({msg: "success"})
+      // }
     }
+    
+
   } catch(error) {
     return res.status(400).json({error: error.message})
   }
   
 
-    // request('http://127.0.0.1:5000/schedule', function (error, response, body) {
-    //     console.error('error:', error); // Print the error
-    //     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    //     console.log('body:', body); // Print the data received
-    //     res.send(body); //Display the response on the website
-    //   }); 
 }
 
 const setDeadline = async (req, res) => {
