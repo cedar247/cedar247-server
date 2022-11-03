@@ -20,7 +20,7 @@ const swappingShiftSchema = new Schema({
         required: true,
     },
     status: {
-        type: Boolean,
+        type: Number,
         required: true,
     }
 }, { timestamps: true })

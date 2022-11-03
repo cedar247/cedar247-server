@@ -5,7 +5,9 @@ const {
     changePassword,
     getShifts,
     getDoctorShifts,
-    setSwappingShifts
+    setSwappingShifts,
+    getRequests,
+    setRequestResponse,
 } = require('../../controllers/doctorController')
 
 const router = express.Router()
@@ -22,5 +24,8 @@ router.post('/getDoctorShifts', getDoctorShifts)
 
 router.post('/setSwappingShifts', setSwappingShifts)
 
+router.post('/getRequests', getRequests)
+
+router.post('/setRequestResponse', setRequestResponse)
 
 module.exports = router

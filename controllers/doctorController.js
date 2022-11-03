@@ -424,7 +424,7 @@ const setSwappingShifts = async (req, res) => {
         fromShiftofSchedule: fromShiftofSchedule,
         toShiftofSchedule: toShiftofSchedule,
         toDoctor: toDoctor,
-        status: true
+        status: 0
     }
 
     
@@ -447,6 +447,166 @@ const setSwappingShifts = async (req, res) => {
     }
 }
 
+
+const getRequests = async (req, res) => {
+    // const id = req.body.id;
+    // const id = "633ab54a9fd528b9532b8d59";
+    const id = "633ab0f123be88c950fb8a89";
+    const fromRequests = [];
+    const toRequests = [];
+
+    console.log(id)
+    console.log("data recieved");
+
+    // const _id ='633ab0f123be88c950fb8a89';
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        console.log(data,"pass1")
+        return res.status(404).json({ error: "Invalid user" });
+    }
+
+    //get the other doctors requests
+    const forSwappingShifts = await SwappingShifts.find({ toDoctor: id });
+
+    for (let i = 0; i < forSwappingShifts.length; i++) {
+        const forSwappingShift = forSwappingShifts[i];
+
+        const fromDoctor = await Doctor.findById({ _id: forSwappingShift.fromDoctor });
+        if(!fromDoctor) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid user"})
+        }
+
+        const toShiftofSchedule = await ShiftOfASchedule.findById({ _id: forSwappingShift.fromShiftofSchedule });
+        if(!toShiftofSchedule) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+
+        const toShift = await Shift.findById({ _id: toShiftofSchedule.shift });
+        if(!toShift) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+        const fromShiftofSchedule = await ShiftOfASchedule.findById({ _id: forSwappingShift.toShiftofSchedule });
+        if(!fromShiftofSchedule) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+
+        const fromShift = await Shift.findById({ _id: fromShiftofSchedule.shift });
+        if(!fromShift) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+    
+        const SwappingShift = {
+            id: forSwappingShift._id,
+            name: fromDoctor.name,
+            fromDate: fromShiftofSchedule.date,
+            fromShiftName: fromShift.name,
+            fromShift: fromShift.startTime.concat(' - ', fromShift.endTime),
+            toDate: toShiftofSchedule.date,
+            toShiftName: toShift.name,
+            toShift: toShift.startTime.concat(' - ', toShift.endTime),
+            status: forSwappingShift.status
+        }
+
+        fromRequests.push(SwappingShift)
+    }
+    console.log(fromRequests)
+    //get the request of corresponding doctor
+    const toSwappingShifts = await SwappingShifts.find({ fromDoctor: id });
+
+    for (let i = 0; i < toSwappingShifts.length; i++) {
+        const toSwappingShift = toSwappingShifts[i];
+        console.log(toSwappingShift)
+        const toDoctor = await Doctor.findById({ _id: toSwappingShift.toDoctor });
+        if(!toDoctor) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid user"})
+        }
+        console.log(toSwappingShift.toShiftofSchedule)
+
+        const fromShiftofSchedule = await ShiftOfASchedule.findById({ _id: toSwappingShift.fromShiftofSchedule });
+        if(!fromShiftofSchedule) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+        console.log(fromShiftofSchedule)
+
+        const fromShift = await Shift.findById({ _id: fromShiftofSchedule.shift });
+        if(!fromShift) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+        
+        const toShiftofSchedule = await ShiftOfASchedule.findById({ _id: toSwappingShift.toShiftofSchedule });
+        if(!toShiftofSchedule) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+
+        const toShift = await Shift.findById({ _id: toShiftofSchedule.shift });
+        if(!toShift) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+    
+        const SwappingShift = {
+            name: toDoctor.name,
+            fromDate: fromShiftofSchedule.date,
+            fromShiftName: fromShift.name,
+            fromShift: fromShift.startTime.concat(' - ', fromShift.endTime),
+            toDate: toShiftofSchedule.date,
+            toShiftName: toShift.name,
+            toShift: toShift.startTime.concat(' - ', toShift.endTime),
+            status: toSwappingShift.status
+        }
+
+        toRequests.push(SwappingShift)
+    }
+
+    console.log(fromRequests)
+    console.log(toRequests)
+    res.status(200).json([fromRequests,toRequests]);
+
+}
+
+const setRequestResponse = async (req, res) => {
+
+    const data = req.body;
+    const requestId = data.requestId;
+    const agree = data.Agree;
+    console.log(data)
+    console.log("data recieved");
+
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+        return res.status(404).json({ error: "Invalid Swappingshift" });
+    }
+    //get the Swappingshift details according to the id
+    const SwappingShift = await SwappingShifts.findById({ _id: requestId });
+    if(!SwappingShift) {
+        return res.status(404).json({error: "Invalid Swappingshift"})
+    } 
+    const updateFields = {}
+    if (agree){
+        updateFields["status"]= 2;
+    }else{
+        updateFields["status"]= 1;
+    }
+    console.log(updateFields)
+    try {
+        const newSwappingShift = await SwappingShifts.findOneAndUpdate( { _id: requestId }, updateFields);
+        if (!newSwappingShift) {
+            return res.status(404).json({ error: "No such swapping shift" });
+        }
+        return res.status(200).json(newSwappingShift)
+    } catch (error) {
+        return res.status(400).json({error: error.message})
+    }
+}
+
 module.exports = {
     defineRequirements,
     changeClendar,
@@ -454,4 +614,6 @@ module.exports = {
     getShifts,
     getDoctorShifts,
     setSwappingShifts,
+    getRequests,
+    setRequestResponse,
 };
