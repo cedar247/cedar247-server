@@ -7,6 +7,7 @@ const Schedule = require('../models/scheduleModel')
 const consultantRequirement = require('../models/consultantRequirement');
 const Requirement = require("../models/requirementModel");
 const Leave = require("../models/leaveModel")
+const ShiftOfASchedule = require("../models/shiftOfAScheduleModel")
 
 const createSchedule = async (req, res) => {
   const data = req.body;
@@ -86,6 +87,10 @@ const createSchedule = async (req, res) => {
       const consecutive_groups = ward.constraints.consecutiveGroups // consecutive groups of shifts
       const specialShifts = ward.constraints.specialShifts // special shifts
       const num_doctors_per_shift = req.body // number of doctors per each shift
+
+      // year and month corresponding to the schedule
+      const year = scheduleUpdated.year
+      const month = scheduleUpdated.month
 
       
       const doctors_details = {} // create an object for doctors' details
@@ -177,23 +182,47 @@ const createSchedule = async (req, res) => {
         consecutive_shifts: consecutive_shifts,
         special_shifts: special_shifts,
         num_doctors: num_doctors,
-        doctorCategories: doctorCategories
+        doctorCategories: doctorCategories,
+        year: year,
+        month: month
       }
       
 
       const response = await axios.post('http://localhost:5000/schedule', data)
       const rosters = response.data
-      for(let i = 0; i < doctorCategories.length; i++) {
-        console.log(rosters[i])
+      const numDays = new Date(year, month, 0).getDate()
+      console.log(numDays)
+
+      for(let i = 0; i < numDays; i++) { // iterate all number of days
+        for(let j = 0; j < shift_types.length; j++) { // iterate through shifts
+          
+          const date = rosters[0][i][0]
+          const shift = shift_types[j]
+          const doctors_all = [] // doctors of all categories
+          for(let k = 0; k < doctorCategories.length; k++) {
+            const doctors = rosters[k][i][j+1]
+
+            if(doctors != -1) { // check whether there are doctors assigned
+              for(let l = 0; l < doctors.length; l++) {
+                doctors_all.push(doctors[l])
+              }
+            }
+          }
+
+          // add shiftOfASchedule to database
+          const shiftOfASchedule = await ShiftOfASchedule.create(
+            {
+              doctors: doctors_all,
+              shift: shift,
+              date: date
+            }
+          )
+
+
+        }
       }
       
-      // createUser()
-
-      
-
-      // if(scheduleUpdated) {
-      //   return res.status(201).json({msg: "success"})
-      // }
+      return res.status(201).json({msg: "schedule successfully created!!!"})
     }
     
 
