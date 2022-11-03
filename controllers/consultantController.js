@@ -2,6 +2,8 @@ const request = require('request');
 const axios = require('axios');
 const Doctor = require('../models/doctorModel')
 const Ward = require('../models/wardModel')
+const Shift = require("../models/shiftModel");
+const ShiftOfASchedule = require("../models/shiftOfAScheduleModel");
 const mongoose = require('mongoose')
 const Schedule = require('../models/scheduleModel')
 const consultantRequirement = require('../models/consultantRequirement');
@@ -331,9 +333,126 @@ const getDoctorCategories = async (req, res) => {
   return res.status(200).json(doctorCategories);
 }
 
+//get the calendar detais according to user preferences
+const viewCalendar = async (req, res) => {
+  const { id, showAllDoctors } = req.body;
+  const appointments = [];
+  const owners = [];
+  const colors = [
+      "#7E57C2",
+      "#FF7043",
+      "#E91E63",
+      "#E91E63",
+      "#AB47BC",
+      "#FFA726",
+  ];
+
+  console.log("data recieved");
+  const data = req.body;
+  console.log(data);
+
+  // const _id ='633ab0f123be88c950fb8a89';
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ error: "Invalid user" });
+  }
+  //get the doctor details according to the id
+  const doctor = await Doctor.findById({ _id: id });
+  if(!doctor) {
+      return res.status(404).json({error: "Invalid user"})
+  }
+  //get the ward which is doctor belongs
+  const ward = await Ward.findById(doctor["WardID"]);
+  if(!ward) {
+      return res.status(404).json({error: "No ward"})
+  }
+  //find schedules which is belong to the ward that we selected
+  const Schedules = await Schedule.find(doctor["WardID"]);
+  if(!Schedules) {
+      return res.status(404).json({error: "No Schedule"})
+  }
+  //get all shifts from above ward
+  const allshifts = {};
+  for (let i = 0; i < ward["shifts"].length; i++) {
+      shiftDetails = await Shift.findById(ward["shifts"][i]);
+      if(!shiftDetails) {
+          return res.status(400).json({error: "Invalid shift"})
+          break;
+      }
+      allshifts[ward["shifts"][i]] = shiftDetails;
+  }
+  // console.log(allshifts);
+  //get all doctors from above ward
+  const alldoctors = {};
+  for (let i = 0; i < ward["doctors"].length; i++) {
+      doctorDetails = await Doctor.findById(ward["doctors"][i]);
+      if(!doctorDetails) {
+          return res.status(404).json({error: "Doctor not found"})
+          break;
+      }
+      alldoctors[ward["doctors"][i]] = i + 1;
+      owners.push({
+          text: doctorDetails["name"],
+          id: i + 1,
+          color: colors[i % 6],
+      });
+  }
+  for (let i = 0; i < Schedules.length; i++) {
+      const shiftOfSchedules = [];
+
+      //get shift of schedules which is belongs to the schedule
+      for (let j = 0; j < Schedules[i]["data"].length; j++) {
+          const shiftOfSchedule = await ShiftOfASchedule.findById(
+              Schedules[i]["data"][j]
+          );
+          if(!doctorDetails) {
+              return res.status(404).json({error: "shift of schedule not found"})
+              break;
+          }
+
+          const shiftInSchedule = allshifts[shiftOfSchedule["shift"]];
+          const doctorsInShift = [];
+          // console.log(shiftInSchedule.toString());
+          //if show all doctor is false it get only the appoinments whci is belong to current doctor
+          if (showAllDoctors == false) {
+              if (shiftOfSchedule["doctors"].includes(id)) {
+                  doctorsInShift.push(alldoctors[id]);
+                  appointments.push({
+                      title: shiftInSchedule["name"],
+                      date: shiftOfSchedule["date"],
+                      startTime: shiftInSchedule["startTime"],
+                      endTime: shiftInSchedule["endTime"],
+                      id: appointments.length,
+                      doctors: doctorsInShift,
+                  });
+              }
+          } else {             //otherwise it gets all the appoinments according to the doctor
+              for (let k = 0; k < shiftOfSchedule["doctors"].length; k++) {
+                  doctorsInShift.push(
+                      alldoctors[shiftOfSchedule["doctors"][k]]
+                  );
+              }
+              appointments.push({
+                  title: shiftInSchedule["name"],
+                  date: shiftOfSchedule["date"],
+                  startTime: shiftInSchedule["startTime"],
+                  endTime: shiftInSchedule["endTime"],
+                  id: appointments.length,
+                  doctors: doctorsInShift,
+              });
+          }
+      }
+  }
+  console.log("done");
+  // console.log(appointments, owners);
+  //return the appoinment and owners list
+  res.status(200).json([appointments, owners]);
+};
+
 module.exports = {
   setDeadline,
   createSchedule,
   getDoctors,
-  getDoctorCategories
+  getDoctorCategories,
+  viewCalendar,
 }
