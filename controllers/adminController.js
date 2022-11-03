@@ -34,11 +34,23 @@ const getWards = async (req, res) => {
 }
 // to get the doctor types
 const getDoctorTypes = async (req, res) => {
+    const wardId = '6339cfeed189aaa0727ebbf1'
+
 
     try {
-        const doctor = await Doctor.find({}, { category: 1 }).distinct('category')
+        const ward = await Ward.findById(wardId); // get the ward
 
-        res.status(200).json(doctor)
+        if(!ward) {
+            return res.status(404).json({error: "No such ward"})
+        }
+
+        const doctorCategories = ward.doctorCategories
+        console.log(doctorCategories)
+
+        // const doctor = await Doctor.find({}, { category: 1 }).distinct('category')
+
+        // res.status(200).json(doctor)
+        res.status(200).json(doctorCategories)
     } catch (error) {
         res.status(400).json({ msg: error.message })
     }
@@ -125,13 +137,13 @@ const CreateConsultant = async (req, res) => {
 const CreateDoctor = async (req, res) => {
     const session = await Doctor.startSession();
     session.startTransaction();
-    console.log(req.body)
+    // console.log(req.body)
     const { name, phoneNumber, email, category, WardID, NewCategory } = req.body
     // const category = NewCategory != "" ? NewCategory : category1
-    console.log(category)
+    // console.log(category)
     //gets the type of the user
     const type = process.env.REACT_APP_DOCTOR_TYPE
-    console.log(type);
+    // console.log(type);
     try {
         const opts = { session };
          //creates the user

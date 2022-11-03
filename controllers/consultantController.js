@@ -5,6 +5,8 @@ const Ward = require('../models/wardModel')
 const mongoose = require('mongoose')
 const Schedule = require('../models/scheduleModel')
 const consultantRequirement = require('../models/consultantRequirement');
+const Requirement = require("../models/requirementModel");
+const Leave = require("../models/leaveModel")
 
 const createSchedule = async (req, res) => {
   const data = req.body;
@@ -83,7 +85,36 @@ const createSchedule = async (req, res) => {
       // create an object for doctors' details
       const doctors_details = {}
 
-      // for(let i = 0; i <  )
+      // initialize empty arrays for each doctor category
+      for(let i = 0; i < doctorCategories.length; i++) {
+        doctors_details[doctorCategories[i]] = []
+      }
+
+      // iterate through doctors list and get details of each doctor
+      for(let i = 0; i < doctorsIds.length; i++) {
+        const doctor = await Doctor.findById(doctorsIds[i])
+
+        const category = doctor.category // category of the doctor
+
+        // check whether doctor's category is correct
+        if(doctorCategories.includes(category)) {
+          const requirements = await Requirement.find({doctor: doctorsIds[i]})
+          const leaves = requirements.leaves; // leaves by doctor
+
+          for(let i = 0; i < leaves.length; i++) {
+            const leaveId = leaves[i] // leave id
+
+            const leave = await Leave.findById(leaveId) // leave
+
+            //Todo: add a condition to get only leave related the scheduling month
+
+            const shifts = leave.shift // shifts of that given 
+          }
+        } else {
+          return res.status(404).json({error: "No such category"})
+        }
+      }
+
       // send schedule data to flask server
       const data = {
         name: 'John Doe',
@@ -91,7 +122,7 @@ const createSchedule = async (req, res) => {
       }
       
       
-      const response = await axios.post('http://localhost:4000/schedule', data)
+      const response = await axios.post('http://localhost:5000/schedule', data)
       console.log(`Status: ${res.status}`)
       console.log('Body: ', res.data)
       
