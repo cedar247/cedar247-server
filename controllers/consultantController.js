@@ -9,7 +9,6 @@ const Schedule = require('../models/scheduleModel')
 const consultantRequirement = require('../models/consultantRequirement');
 const Requirement = require("../models/requirementModel");
 const Leave = require("../models/leaveModel")
-const ShiftOfASchedule = require("../models/shiftOfAScheduleModel")
 
 const createSchedule = async (req, res) => {
   const data = req.body;
