@@ -10,7 +10,6 @@ const consultantRequirement = require('../models/consultantRequirement');
 const Requirement = require("../models/requirementModel");
 const Leave = require("../models/leaveModel")
 const SwappingShifts = require("../models/swappingShiftModel");
-const Shift = require("../models/shiftModel");
 
 const createSchedule = async (req, res) => {
   const data = req.body;
@@ -574,6 +573,6 @@ module.exports = {
   getDoctors,
   getDoctorCategories,
   getRequests,
-  setRequestResponse,,
+  setRequestResponse,
   viewCalendar,
 }

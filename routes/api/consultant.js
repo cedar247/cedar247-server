@@ -5,7 +5,7 @@ const {
     getDoctors,
     getDoctorCategories,
     getRequests,
-    setRequestResponse,,
+    setRequestResponse,
     viewCalendar,
 } = require('../../controllers/consultantController')
 
