@@ -1,7 +1,9 @@
 const request = require('request');
 const axios = require('axios');
-const Doctor = require('../models/doctorModel')
-const Ward = require('../models/wardModel')
+const Consultant = require('../models/consultantModel');
+const User = require("../models/userModel");
+const Doctor = require('../models/doctorModel');
+const Ward = require('../models/wardModel');
 const Shift = require("../models/shiftModel");
 const ShiftOfASchedule = require("../models/shiftOfAScheduleModel");
 const mongoose = require('mongoose')
@@ -10,6 +12,7 @@ const consultantRequirement = require('../models/consultantRequirement');
 const Requirement = require("../models/requirementModel");
 const Leave = require("../models/leaveModel")
 const SwappingShifts = require("../models/swappingShiftModel");
+const bcrypt = require('bcrypt');
 
 const createSchedule = async (req, res) => {
   const data = req.body;
@@ -451,6 +454,44 @@ const setRequestResponse = async (req, res) => {
   }
 }
 
+//changing doctro password
+const changePassword = async (req, res) => {
+  console.log("data recieved");
+  const data = req.body;
+  console.log(data);
+  const id ='633ab0f123be88c950fb8a89';
+
+  const hashedPassword = bcrypt.hashSync(data["password"],9);
+  console.log(hashedPassword)
+  const updateFields = {
+      email: data["email"],
+      password: hashedPassword,
+  };
+  console.log(updateFields);
+
+  //get the ward which is doctor belongs
+  const consultant = await Consultant.findById({ _id: data["id"] });
+  if(!consultant) {
+      return res.status(404).json({error: "Invalid user"})
+  }
+  console.log(consultant);
+  try {
+      //find and update the doctos email and the password
+      const updateConsultant = await User.findOneAndUpdate(
+          { _id: consultant["userId"] },
+          updateFields
+      );
+      console.log(updateConsultant,"yes");
+
+      if (!updateConsultant) {
+          return res.status(404).json({ error: "No such workout" });
+      }
+      res.status(200).json(updateConsultant);
+  } catch (error) {
+      return res.status(400).json({error: error.message})
+  }
+};
+
 //get the calendar detais according to user preferences
 const viewCalendar = async (req, res) => {
   const { id, showAllDoctors } = req.body;
@@ -574,5 +615,6 @@ module.exports = {
   getDoctorCategories,
   getRequests,
   setRequestResponse,
+  changePassword,
   viewCalendar,
 }

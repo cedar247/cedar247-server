@@ -7,6 +7,7 @@ const {
     getRequests,
     setRequestResponse,
     viewCalendar,
+    changePassword,
 } = require('../../controllers/consultantController')
 
 const router = express.Router()
@@ -19,7 +20,8 @@ router
     .post('/viewCalendar', viewCalendar)
     .post('/getRequests', getRequests)
     .post('/setRequestResponse', setRequestResponse)
-    
+    .post('/changePassword',changePassword)
+
 
 
 module.exports = router
