@@ -198,9 +198,6 @@ const changePassword = async (req, res) => {
     };
     console.log(updateFields);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: "Invalid user" });
-    }
     //get the ward which is doctor belongs
     const doctor = await Doctor.findById({ _id: data["id"] });
     if(!doctor) {
