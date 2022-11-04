@@ -9,6 +9,8 @@ const Schedule = require('../models/scheduleModel')
 const consultantRequirement = require('../models/consultantRequirement');
 const Requirement = require("../models/requirementModel");
 const Leave = require("../models/leaveModel")
+const SwappingShifts = require("../models/swappingShiftModel");
+const Shift = require("../models/shiftModel");
 
 const createSchedule = async (req, res) => {
   const data = req.body;
@@ -332,6 +334,124 @@ const getDoctorCategories = async (req, res) => {
   return res.status(200).json(doctorCategories);
 }
 
+const getRequests = async (req, res) => {
+  // const id = req.body.id;
+  // const id = "633ab54a9fd528b9532b8d59";
+  const id = "633ab0f123be88c950fb8a89";
+  const Requests = [];
+  const acceptededRequests = [];
+  const rejectedRequests = [];
+
+  console.log(id)
+  console.log("data recieved");
+
+  // const _id ='633ab0f123be88c950fb8a89';
+
+  // if (!mongoose.Types.ObjectId.isValid(id)) {
+  //     console.log(data,"pass1")
+  //     return res.status(404).json({ error: "Invalid user" });
+  // }
+
+  //get the other doctors requests
+  const forSwappingShifts = await SwappingShifts.find({status: [2,3,4]});
+
+  for (let i = 0; i < forSwappingShifts.length; i++) {
+      const forSwappingShift = forSwappingShifts[i];
+
+      const fromDoctor = await Doctor.findById({ _id: forSwappingShift.fromDoctor });
+      if(!fromDoctor) {
+          console.log(data,"pass2")
+          return res.status(404).json({error: "Invalid user"})
+      }
+      const toDoctor = await Doctor.findById({ _id: forSwappingShift.toDoctor });
+      if(!fromDoctor) {
+          console.log(data,"pass2")
+          return res.status(404).json({error: "Invalid user"})
+      }
+
+      const toShiftofSchedule = await ShiftOfASchedule.findById({ _id: forSwappingShift.toShiftofSchedule });
+      if(!toShiftofSchedule) {
+          console.log(data,"pass2")
+          return res.status(404).json({error: "Invalid ShiftofSchedule"})
+      }
+
+      const toShift = await Shift.findById({ _id: toShiftofSchedule.shift });
+      if(!toShift) {
+          console.log(data,"pass2")
+          return res.status(404).json({error: "Invalid Shift"})
+      }
+      const fromShiftofSchedule = await ShiftOfASchedule.findById({ _id: forSwappingShift.fromShiftofSchedule });
+      if(!fromShiftofSchedule) {
+          console.log(data,"pass2")
+          return res.status(404).json({error: "Invalid ShiftofSchedule"})
+      }
+
+      const fromShift = await Shift.findById({ _id: fromShiftofSchedule.shift });
+      if(!fromShift) {
+          console.log(data,"pass2")
+          return res.status(404).json({error: "Invalid Shift"})
+      }
+  
+      const SwappingShift = {
+          id: forSwappingShift._id,
+          fromName: fromDoctor.name,
+          toName: toDoctor.name,
+          fromDate: fromShiftofSchedule.date,
+          fromShiftName: fromShift.name,
+          fromShift: fromShift.startTime.concat(' - ', fromShift.endTime),
+          toDate: toShiftofSchedule.date,
+          toShiftName: toShift.name,
+          toShift: toShift.startTime.concat(' - ', toShift.endTime),
+          status: forSwappingShift.status
+      }
+
+      if(forSwappingShift.status == 2){
+        Requests.push(SwappingShift)
+      }else if(forSwappingShift.status == 3){
+        rejectedRequests.push(SwappingShift)
+      }else{
+        acceptededRequests.push(SwappingShift)
+      }
+
+  }
+  res.status(200).json([Requests,acceptededRequests,rejectedRequests]);
+
+}
+
+const setRequestResponse = async (req, res) => {
+
+  const data = req.body;
+  const requestId = data.requestId;
+  const agree = data.Agree;
+  console.log(data)
+  console.log("data recieved");
+
+  if (!mongoose.Types.ObjectId.isValid(requestId)) {
+      return res.status(404).json({ error: "Invalid Swappingshift" });
+  }
+  //get the Swappingshift details according to the id
+  const SwappingShift = await SwappingShifts.findById({ _id: requestId });
+  if(!SwappingShift) {
+      return res.status(404).json({error: "Invalid Swappingshift"})
+  } 
+  const updateFields = {}
+  if (agree){
+      updateFields["status"]= 4;
+  }else{
+      updateFields["status"]= 3;
+  }
+  console.log(updateFields)
+  try {
+      const newSwappingShift = await SwappingShifts.findOneAndUpdate( { _id: requestId }, updateFields);
+      if (!newSwappingShift) {
+          return res.status(404).json({ error: "No such swapping shift" });
+      }
+      return res.status(200).json(newSwappingShift)
+  } catch (error) {
+      return res.status(400).json({error: error.message})
+  }
+}
+
 //get the calendar detais according to user preferences
 const viewCalendar = async (req, res) => {
   const { id, showAllDoctors } = req.body;
@@ -453,5 +573,7 @@ module.exports = {
   createSchedule,
   getDoctors,
   getDoctorCategories,
+  getRequests,
+  setRequestResponse,,
   viewCalendar,
 }
