@@ -300,14 +300,14 @@ const getDoctorShifts = async (req, res) => {
         alldoctors[ward["doctors"][i]] = doctorDetails["name"];
     }
 
-    const fromShiftOfSchedules = await ShiftOfASchedule.find({ date: fromDate });
+    const fromShiftOfSchedules = await ShiftOfASchedule.find({ date: fromDate, ward: ward });
     // console.log(fromShiftOfSchedules);
     if(fromShiftOfSchedules.length == 0){
         console.log(data,"pass3")
         return res.status(404).json({error: "no shift Of Schedule"});
     }
 
-    const toShiftOfSchedules = await ShiftOfASchedule.find({ date: toDate });
+    const toShiftOfSchedules = await ShiftOfASchedule.find({ date: toDate, ward: ward });
     // console.log(toShiftOfSchedules);
     if(toShiftOfSchedules.length == 0){
         console.log(data,"pass4")
@@ -400,28 +400,40 @@ const setSwappingShifts = async (req, res) => {
         console.log(data,"pass1")
         return res.status(404).json({ error: "Invalid user" });
     }
+    
+    const doctor = await Doctor.findById({ _id: fromDoctor });
+    if(!doctor) {
+        console.log(data,"pass2")
+        return res.status(404).json({error: "Invalid user"})
+    }
+    const ward = doctor.WardID;
+    console.log("pass1")
 
     if (!mongoose.Types.ObjectId.isValid(fromShiftofSchedule)) {
         console.log(data,"pass1")
         return res.status(404).json({ error: "Invalid ShiftofSchedule" });
     }
+    console.log("pass2")
 
     if (!mongoose.Types.ObjectId.isValid(toShiftofSchedule)) {
         console.log(data,"pass1")
         return res.status(404).json({ error: "Invalid ShiftofSchedule" });
     }
+    console.log("pass3")
 
     if (!mongoose.Types.ObjectId.isValid(toDoctor)) {
         console.log(data,"pass1")
         return res.status(404).json({ error: "Invalid user" });
     }
+    console.log("pass4")
 
     const SwappingShift ={
         fromDoctor: fromDoctor,
         fromShiftofSchedule: fromShiftofSchedule,
         toShiftofSchedule: toShiftofSchedule,
         toDoctor: toDoctor,
-        status: 0
+        ward: ward,
+        status: 0,
     }
 
     
@@ -430,8 +442,11 @@ const setSwappingShifts = async (req, res) => {
             fromDoctor: fromDoctor,
             fromShiftofSchedule: fromShiftofSchedule,
             toShiftofSchedule: toShiftofSchedule,
-            toDoctor: toDoctor
+            toDoctor: toDoctor,
+            ward: ward,
         });
+        console.log(SwappingShift)
+
         if(existingSwappingShift.length == 0){
             const newSwappingShift = await SwappingShifts.create(SwappingShift);
             res.status(200).json("Successfull");
@@ -447,24 +462,29 @@ const setSwappingShifts = async (req, res) => {
 
 const getRequests = async (req, res) => {
     // const id = req.body.id;
-    // const id = "633ab54a9fd528b9532b8d59";
-    const id = "633ab0f123be88c950fb8a89";
+    const id = new mongoose.Types.ObjectId("633ab54a9fd528b9532b8d59");
+    // const id = "633ab0f123be88c950fb8a89";
     const fromRequests = [];
     const toRequests = [];
 
     console.log(id)
     console.log("data recieved");
-
     // const _id ='633ab0f123be88c950fb8a89';
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         console.log(data,"pass1")
         return res.status(404).json({ error: "Invalid user" });
     }
-
+    const doctor = await Doctor.findById({ _id: id });
+    if(!doctor) {
+        console.log(data,"pass2")
+        return res.status(404).json({error: "Invalid user"})
+    }
+    const  ward = doctor.WardID
+    // console.log({ toDoctor: id, ward:ward } )
     //get the other doctors requests
-    const forSwappingShifts = await SwappingShifts.find({ toDoctor: id });
-
+    const forSwappingShifts = await SwappingShifts.find({ toDoctor: id, ward:ward });
+console.log(forSwappingShifts)
     for (let i = 0; i < forSwappingShifts.length; i++) {
         const forSwappingShift = forSwappingShifts[i];
 
@@ -513,7 +533,7 @@ const getRequests = async (req, res) => {
     }
     console.log(fromRequests)
     //get the request of corresponding doctor
-    const toSwappingShifts = await SwappingShifts.find({ fromDoctor: id });
+    const toSwappingShifts = await SwappingShifts.find({ fromDoctor: id, ward:ward });
 
     for (let i = 0; i < toSwappingShifts.length; i++) {
         const toSwappingShift = toSwappingShifts[i];

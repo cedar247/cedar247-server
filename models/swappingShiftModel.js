@@ -19,6 +19,11 @@ const swappingShiftSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
     },
+    ward:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ward',
+        required: true,
+    },
     status: {
         type: Number,
         required: true,

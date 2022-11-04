@@ -219,7 +219,8 @@ const createSchedule = async (req, res) => {
             {
               doctors: doctors_all,
               shift: shift,
-              date: date
+              date: date,
+              ward: wardId
             }
           )
 
@@ -337,9 +338,9 @@ const getDoctorCategories = async (req, res) => {
 }
 
 const getRequests = async (req, res) => {
-  // const id = req.body.id;
-  // const id = "633ab54a9fd528b9532b8d59";
-  const id = "633ab0f123be88c950fb8a89";
+  const data = req.body
+  const id = data.id;
+  // const id = "633aabe28cad2f59865cb5de";
   const Requests = [];
   const acceptededRequests = [];
   const rejectedRequests = [];
@@ -349,13 +350,18 @@ const getRequests = async (req, res) => {
 
   // const _id ='633ab0f123be88c950fb8a89';
 
-  // if (!mongoose.Types.ObjectId.isValid(id)) {
-  //     console.log(data,"pass1")
-  //     return res.status(404).json({ error: "Invalid user" });
-  // }
-
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log(data,"pass1")
+      return res.status(404).json({ error: "Invalid user" });
+  }
+  const consultant = await Consultant.findById({ _id: id });
+  if(!consultant) {
+      console.log(data,"pass2")
+      return res.status(404).json({error: "Invalid user"})
+  }
+  const ward = consultant.wardId
   //get the other doctors requests
-  const forSwappingShifts = await SwappingShifts.find({status: [2,3,4]});
+  const forSwappingShifts = await SwappingShifts.find({status: [2,3,4], Ward: ward});
 
   for (let i = 0; i < forSwappingShifts.length; i++) {
       const forSwappingShift = forSwappingShifts[i];
@@ -516,17 +522,17 @@ const viewCalendar = async (req, res) => {
       return res.status(404).json({ error: "Invalid user" });
   }
   //get the doctor details according to the id
-  const doctor = await Doctor.findById({ _id: id });
+  const consultant = await Consultant.findById({ _id: id });
   if(!doctor) {
       return res.status(404).json({error: "Invalid user"})
   }
   //get the ward which is doctor belongs
-  const ward = await Ward.findById(doctor["WardID"]);
+  const ward = await Ward.findById(Consultant["WardID"]);
   if(!ward) {
       return res.status(404).json({error: "No ward"})
   }
   //find schedules which is belong to the ward that we selected
-  const Schedules = await Schedule.find(doctor["WardID"]);
+  const Schedules = await Schedule.find(consultant["WardID"]);
   if(!Schedules) {
       return res.status(404).json({error: "No Schedule"})
   }
