@@ -188,7 +188,8 @@ const changePassword = async (req, res) => {
     console.log("data recieved");
     const data = req.body;
     console.log(data);
-    const id ='633ab0f123be88c950fb8a89';
+    const id = data.id;
+    // const id ='633ab0f123be88c950fb8a89';
 
     const hashedPassword = bcrypt.hashSync(data["password"],9);
     console.log(hashedPassword)
@@ -224,8 +225,7 @@ const changePassword = async (req, res) => {
 //get the shifts belong to the ward of doctor
 const getShifts = async (req, res) => {
 
-    const id = '633ab0f123be88c950fb8a89'
-    const wardId = '6338771f6b128f6cfffef6b3';
+    const id = req.body.id
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ error: "Invalid user" });
@@ -461,15 +461,14 @@ const setSwappingShifts = async (req, res) => {
 
 
 const getRequests = async (req, res) => {
-    // const id = req.body.id;
-    const id = new mongoose.Types.ObjectId("633ab54a9fd528b9532b8d59");
+    const id = req.body.id;
+    // const id = new mongoose.Types.ObjectId("633ab54a9fd528b9532b8d59");
     // const id = "633ab0f123be88c950fb8a89";
     const fromRequests = [];
     const toRequests = [];
 
     console.log(id)
     console.log("data recieved");
-    // const _id ='633ab0f123be88c950fb8a89';
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         console.log(data,"pass1")
