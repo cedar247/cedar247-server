@@ -197,6 +197,11 @@ const changePassword = async (req, res) => {
         email: data["email"],
         password: hashedPassword,
     };
+    
+    const updateDoctorFileds = {
+        email: data["email"],
+    };
+
     console.log(updateFields);
 
     //get the ward which is doctor belongs
@@ -206,17 +211,24 @@ const changePassword = async (req, res) => {
     }
     // console.log(doctor);
     try {
-        //find and update the doctos email and the password
-        const updateDoctor = await User.findOneAndUpdate(
-            { _id: doctor["userId"] },
-            updateFields
+        const updateDoctor = await Doctor.findOneAndUpdate(
+            { _id: consultant["userId"] },
+            updateDoctorFileds
         );
-        console.log(updateDoctor);
-
         if (!updateDoctor) {
             return res.status(404).json({ error: "No such workout" });
         }
-        res.status(200).json(updateDoctor);
+        //find and update the doctos email and the password
+        const updateUser = await User.findOneAndUpdate(
+            { _id: doctor["userId"] },
+            updateFields
+        );
+        console.log(updateUser);
+
+        if (!updateUser) {
+            return res.status(404).json({ error: "No such workout" });
+        }
+        res.status(200).json(updateUser);
     } catch (error) {
         return res.status(400).json({error: error.message})
     }

@@ -611,8 +611,12 @@ const changePassword = async (req, res) => {
       email: data["email"],
       password: hashedPassword,
   };
-  console.log(updateFields);
 
+  const updateConsultantFileds = {
+    email: data["email"],
+};
+
+  console.log(updateFields);
   //get the ward which is doctor belongs
   const consultant = await Consultant.findById({ _id: data["id"] });
   if(!consultant) {
@@ -620,17 +624,24 @@ const changePassword = async (req, res) => {
   }
   console.log(consultant);
   try {
+      const updateConsultant = await Consultant.findOneAndUpdate(
+        { _id: consultant["userId"] },
+        updateConsultantFileds
+      );
+      if (!updateConsultant) {
+        return res.status(404).json({ error: "No such workout" });
+      }
       //find and update the doctos email and the password
-      const updateConsultant = await User.findOneAndUpdate(
+      const updateUser = await User.findOneAndUpdate(
           { _id: consultant["userId"] },
           updateFields
       );
-      console.log(updateConsultant,"yes");
+      console.log(updateUser,"yes");
 
-      if (!updateConsultant) {
+      if (!updateUser) {
           return res.status(404).json({ error: "No such workout" });
       }
-      res.status(200).json(updateConsultant);
+      res.status(200).json(updateUser);
   } catch (error) {
       return res.status(400).json({error: error.message})
   }
