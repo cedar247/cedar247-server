@@ -33,7 +33,7 @@ const doLogin = async (req,res)=>{
                     userId:user._id
                 })
                 if(doctor){
-                    console.log(doctor._id,doctor.userId,doctor.category);
+                    // console.log(doctor._id,doctor.userId,doctor.category);
                     const token = createToken(doctor._id,user.type)
                     return res.status(200).json({status:"ok", userid : user,token:token})
                 }else{
