@@ -13,7 +13,7 @@ const createToken = (_id,type) =>{
 }
 // function to do a user login
 const doLogin = async (req,res)=>{
-    console.log(req.body);
+    // console.log(req.body);
     try{
         //checks for exitance of the email
     const user = await User.findOne({

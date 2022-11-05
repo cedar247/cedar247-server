@@ -40,12 +40,12 @@ const wardSchema = new Schema({
                 shift: mongoose.Schema.Types.ObjectId,
                 vacation: Number
             }
-        ],
-        casualtyDay: String,
-        casualtyDayShifts: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Shift'
-        }]
+        ]
+        // casualtyDay: String,
+        // casualtyDayShifts: [{
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: 'Shift'
+        // }]
     },
     
     doctors: [{
