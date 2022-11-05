@@ -4,6 +4,7 @@ const Ward = require('../models/wardModel')
 const Shift = require('../models/shiftModel')
 const mongoose = require('mongoose')
 const User = require('../models/userModel')
+const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 // to get all consultant 
@@ -210,11 +211,27 @@ const addWard = async (req, res) => {
     const session = req.session;
     const { name, number, doctorCategories, shifts } = req.body;
     const shiftIds = []
-
-    const categories = Object.keys(doctorCategories).filter(key => doctorCategories[key] === true);
-
-
+    const bearerHeader = req.header('Authorization');
+    // const user = {}
+    
     try {
+        
+        // decode the jwt token
+        if(!bearerHeader) {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1]
+        const user = jwt.verify(token, process.env.SECRET);
+
+        if(!user || user.type !== "Admin") {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+        
+        // doctor categories of the ward
+        const categories = Object.keys(doctorCategories).filter(key => doctorCategories[key] === true);
+    
         for (let i = 0; i < shifts.length; i++) {
             const shift = await Shift.create(shifts[i])
             shiftIds.push(shift._id)
@@ -224,33 +241,54 @@ const addWard = async (req, res) => {
             number: number,
             shifts: shiftIds,
             doctorCategories: categories
-        })
+        }) // create the ward
+
         const wardCreated = await Ward.create(ward)
-        session.wardId = wardCreated._id;
-        console.log(req.session)
-        session.id = 1
-        res.status(201).json({ msg: "succcess" })
+        user.wardId = wardCreated._id;
+        const new_token = jwt.sign(user,process.env.SECRET)
+        // console.log(new_token)
+        return res.status(201).json({ msg: "succcess", token: new_token })
     } catch (error) {
-        res.status(400).json({ error: error.message })
+        return res.status(400).json({ error: error.message })
     }
 
 }
 
 const setConstraints = async (req, res) => {
     const data = req.body;
-    const wardId = '6339cfeed189aaa0727ebbf1';
-
-    if (!mongoose.Types.ObjectId.isValid(wardId)) {
-        return res.status(404).json({ error: "No such ward" })
-    }
-    
-    const ward = await Ward.findById(wardId)
-
-    if (!ward) {
-        return res.status(404).json({ error: "No such ward" })
-    }
+    const bearerHeader = req.header('Authorization'); // header
 
     try {
+
+        // decode the jwt token
+        if(!bearerHeader) {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1]
+        const user = jwt.verify(token, process.env.SECRET);
+
+        if(!user || user.type !== "Admin") {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        if(!user.wardId) {
+            return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+        }
+
+        const wardId = user.wardId; // get the ward id from token
+
+        if (!mongoose.Types.ObjectId.isValid(wardId)) { // check if ward id exists in wards collection
+            return res.status(404).json({ error: "No such ward" })
+        }
+        
+        const ward = await Ward.findById(wardId)
+    
+        if (!ward) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+
         const maxLeaves = parseInt(data.maxLeaves)
         const numConsecutiveGroupShifts = parseInt(data.numConsecutiveGroupShifts)
         const specialShifts = []
@@ -265,22 +303,20 @@ const setConstraints = async (req, res) => {
             }   
         }
 
-        const casualtyDay = data.casualtyDay
-        const casualtyDayShifts = []
+        // const casualtyDay = data.casualtyDay
+        // const casualtyDayShifts = []
 
-        // add casualty day shifts to 
-        for(let i = 0; i < data.casualtyDayShifts.length; i++){
-            if(data.casualtyDayShifts[i].checked === true){
-                casualtyDayShifts.push(data.casualtyDayShifts[i].id)
-            }
-        }
+        // // add casualty day shifts to 
+        // for(let i = 0; i < data.casualtyDayShifts.length; i++){
+        //     if(data.casualtyDayShifts[i].checked === true){
+        //         casualtyDayShifts.push(data.casualtyDayShifts[i].id)
+        //     }
+        // }
 
         const constraints = {
             maxLeaves,
             numConsecutiveGroupShifts,
             specialShifts,
-            casualtyDay,
-            casualtyDayShifts
         }
 
         console.log(constraints)
@@ -295,63 +331,99 @@ const setConstraints = async (req, res) => {
 }
 
 const getShifts = async (req, res) => {
-    // const { wardId } = req.params;
-    const session = req.session;
-    // const wardId = session.wardId;
-    // const wardId = '6338771f6b128f6cfffef6b3';
-    const wardId = '6339cfeed189aaa0727ebbf1';
+    const bearerHeader = req.header('Authorization');
 
-    if (!mongoose.Types.ObjectId.isValid(wardId)) {
-        return res.status(404).json({ error: "No such ward" })
-    }
+    try {
+        if(!bearerHeader) {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
 
-    const ward = await Ward.findById(wardId)
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1]
+        const user = jwt.verify(token, process.env.SECRET);
 
-    if (!ward) {
-        return res.status(404).json({ error: "No such ward" })
-    }
+        if(!user || user.type !== "Admin") {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
 
-    const shifts = ward.shifts;
+        if(!user.wardId) {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+        const wardId = user.wardId;
 
-    if (shifts === []) {
-        return res.status(200).json({ msg: "No shifts" })
-    }
-
-    const shiftDetails = [];
-
-    for (let i = 0; i < shifts.length; i++) {
-        const shiftId = shifts[i]
-
-        if (!mongoose.Types.ObjectId.isValid(shiftId)) {
-            // return res.status(404).json({error: "No such ward"})
-            console.log("No such shift")
-        } else {
-            const shift = await Shift.findById(shiftId)
-            if (!shift) {
+        if (!mongoose.Types.ObjectId.isValid(wardId)) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+    
+        const ward = await Ward.findById(wardId)
+    
+        if (!ward) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+    
+        const shifts = ward.shifts;
+    
+        if (shifts === []) {
+            return res.status(200).json({ msg: "No shifts" })
+        }
+    
+        const shiftDetails = [];
+    
+        for (let i = 0; i < shifts.length; i++) {
+            const shiftId = shifts[i]
+    
+            if (!mongoose.Types.ObjectId.isValid(shiftId)) {
+                // return res.status(404).json({error: "No such ward"})
                 console.log("No such shift")
             } else {
-                shiftDetails.push(shift)
+                const shift = await Shift.findById(shiftId)
+                if (!shift) {
+                    console.log("No such shift")
+                } else {
+                    shiftDetails.push(shift)
+                }
             }
         }
+    
+        return res.status(200).json(shiftDetails)
+    } catch(error) {
+        return res.status(400).json({ error: error.message })
     }
-
-    return res.status(200).json(shiftDetails)
 }
 
 const getNumConsecGroups = async (req, res) => {
-    const wardId = '6339cfeed189aaa0727ebbf1';
-
-    if (!mongoose.Types.ObjectId.isValid(wardId)) {
-        return res.status(404).json({ error: "No such ward" })
-    }
-
-    const ward = await Ward.findById(wardId)
-
-    if (!ward) {
-        return res.status(404).json({ error: "No such ward" })
-    }
+    const bearerHeader = req.header('Authorization'); // header
 
     try {
+        // decode the jwt token
+        if(!bearerHeader) {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1]
+        const user = jwt.verify(token, process.env.SECRET);
+
+        if(!user || user.type !== "Admin") {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        if(!user.wardId) {
+            return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+        }
+
+        const wardId = user.wardId; // get the ward id from token
+
+        if (!mongoose.Types.ObjectId.isValid(wardId)) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+    
+        const ward = await Ward.findById(wardId)
+    
+        if (!ward) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+
         const numConsecGroups = ward.constraints.numConsecutiveGroupShifts
 
         if(numConsecGroups) {
@@ -365,18 +437,38 @@ const getNumConsecGroups = async (req, res) => {
 
 const setConsecGroups = async (req, res) => {
     const data = req.body;
-    const wardId = '6339cfeed189aaa0727ebbf1';
-
-    if (!mongoose.Types.ObjectId.isValid(wardId)) {
-        return res.status(404).json({ error: "No such ward" })
-    }
-
-    const ward = await Ward.findById(wardId)
-
-    if (!ward) {
-        return res.status(404).json({ error: "No such ward" })
-    }
+    const bearerHeader = req.header('Authorization'); // header
+    
     try{
+        // decode the jwt token
+        if(!bearerHeader) {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1]
+        const user = jwt.verify(token, process.env.SECRET);
+
+        if(!user || user.type !== "Admin") {
+            return res.status(401).json({ error: "Unauthorized access"})
+        }
+
+        if(!user.wardId) {
+            return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+        }
+
+        const wardId = user.wardId; // get the ward id from token
+        
+        if (!mongoose.Types.ObjectId.isValid(wardId)) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+    
+        const ward = await Ward.findById(wardId)
+    
+        if (!ward) {
+            return res.status(404).json({ error: "No such ward" })
+        }
+
         const consecGroups = []
         for(let i = 0; i < data.length; i++) {
             const consecGroup_current = []
