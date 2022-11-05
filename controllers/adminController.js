@@ -330,6 +330,34 @@ const setConstraints = async (req, res) => {
     }
 }
 
+const getWardId = async (user) => {
+    if(user.type === "Admin") {
+        if(!user.wardId) {
+            return false
+        }
+        return user.wardId
+    }
+
+    const consultantId = user._id;
+
+    if(!mongoose.Types.ObjectId.isValid(consultantId)) {
+      return false
+    }
+
+    const consultant = await Consultant.findById(consultantId) // get the details of the consultant
+
+    if(!consultant) { // no such consultant
+      return false
+    }
+
+    if(!consultant.WardID) {
+        return false // check if status 401 is matching with the error
+    }
+
+    const wardId = consultant.WardID; // get the ward id from token
+    return wardId
+}
+
 const getShifts = async (req, res) => {
     const bearerHeader = req.header('Authorization');
 
@@ -342,14 +370,14 @@ const getShifts = async (req, res) => {
         const token = bearer[1]
         const user = jwt.verify(token, process.env.SECRET);
 
-        if(!user || user.type !== "Admin") {
+        if(!user || !(user.type === "Admin" || user.type === "CONSULTANT")) {
             return res.status(401).json({ error: "Unauthorized access"})
         }
 
-        if(!user.wardId) {
+        const wardId = await getWardId(user);
+        if(!wardId) {
             return res.status(401).json({ error: "Unauthorized access"})
         }
-        const wardId = user.wardId;
 
         if (!mongoose.Types.ObjectId.isValid(wardId)) {
             return res.status(404).json({ error: "No such ward" })

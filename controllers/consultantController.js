@@ -13,40 +13,70 @@ const Requirement = require("../models/requirementModel");
 const Leave = require("../models/leaveModel")
 const SwappingShifts = require("../models/swappingShiftModel");
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken")
+require('dotenv').config()
 
 const createSchedule = async (req, res) => {
   const data = req.body;
-  const wardId = '6339cfeed189aaa0727ebbf1' // ward Id
-  
-
-
-  const categoriesBinding = {
-    'Senior Registrar': 'seniorRegistrar',
-    'Registrar': 'registrar',
-    'Senior Home Officer': 'seniorHomeOfficer',
-    'Home Officer': 'homeOfficer',
-    "Medical Officer": 'medicalOfficer'
-  }
-
-  if (!mongoose.Types.ObjectId.isValid(wardId)) {
-    return res.status(404).json({error: "No such ward"})
-  }
-
-  const ward = await Ward.findById(wardId);
-
-  if(!ward) {
-      return res.status(404).json({error: "No such ward"})
-  }
-
-  const scheduleID = ward.currentScheduleID; // get current schedule Id of the ward
-
-  const schedule = await Schedule.findById(scheduleID);
-
-  if(!schedule) { // check whether the schedule is exists in the database
-    return res.status(404).json({error: "No such schedule"})
-  }
+  const bearerHeader = req.header('Authorization'); // header
 
   try{
+    // decode the jwt token
+    if(!bearerHeader) {
+      return res.status(401).json({ error: "Unauthorized access"})
+    }
+
+    const bearer = bearerHeader.split(' ');
+    const token = bearer[1]
+    const user = jwt.verify(token, process.env.SECRET);
+
+    if(!user || user.type !== "CONSULTANT") {
+        return res.status(401).json({ error: "Unauthorized access"})
+    }
+
+    const consultantId = user._id;
+
+    if(!mongoose.Types.ObjectId.isValid(consultantId)) {
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    const consultant = await Consultant.findById(consultantId) // get the details of the consultant
+
+    if(!consultant) { // no such consultant
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    if(!consultant.WardID) {
+        return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+    }
+
+    const wardId = consultant.WardID; // get the ward id from token
+
+    const categoriesBinding = {
+      'Senior Registrar': 'seniorRegistrar',
+      'Registrar': 'registrar',
+      'Senior Home Officer': 'seniorHomeOfficer',
+      'Home Officer': 'homeOfficer',
+      "Medical Officer": 'medicalOfficer'
+    }
+  
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
+      return res.status(404).json({error: "No such ward"})
+    }
+  
+    const ward = await Ward.findById(wardId);
+  
+    if(!ward) {
+        return res.status(404).json({error: "No such ward"})
+    }
+  
+    const scheduleID = ward.currentScheduleID; // get current schedule Id of the ward
+  
+    const schedule = await Schedule.findById(scheduleID);
+  
+    if(!schedule) { // check whether the schedule is exists in the database
+      return res.status(404).json({error: "No such schedule"})
+    }
     const requirementIds = [];
     for(let i = 0; i < data.length; i++) {
       const requirementDetails = data[i];
@@ -111,6 +141,8 @@ const createSchedule = async (req, res) => {
           consecutive_shifts[consecutive_group[j]] = consecutive_group[j+1]
         }
       }
+
+      console.log(consecutive_shifts)
 
       // create a dictionary for special shifts
       for(let i = 0; i < specialShifts.length; i++) {
@@ -223,8 +255,6 @@ const createSchedule = async (req, res) => {
               ward: wardId
             }
           )
-
-
         }
       }
       
@@ -244,20 +274,50 @@ const setDeadline = async (req, res) => {
   const year = data.year;
   const month = data.month;
   const deadline = data.deadline;
-  const wardId = '6339cfeed189aaa0727ebbf1'
+  const bearerHeader = req.header('Authorization'); // header
   
-  if (!mongoose.Types.ObjectId.isValid(wardId)) {
-    return res.status(404).json({error: "No such ward"})
-  }
-  
-  const ward = await Ward.findById(wardId);
-  
-
-  if(!ward) {
-      return res.status(404).json({error: "No such ward"})
-  }
-
   try {
+    // decode the jwt token
+    if(!bearerHeader) {
+      return res.status(401).json({ error: "Unauthorized access"})
+    }
+
+    const bearer = bearerHeader.split(' ');
+    const token = bearer[1]
+    const user = jwt.verify(token, process.env.SECRET);
+
+    if(!user || user.type !== "CONSULTANT") {
+        return res.status(401).json({ error: "Unauthorized access"})
+    }
+
+    const consultantId = user._id;
+
+    if(!mongoose.Types.ObjectId.isValid(consultantId)) {
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    const consultant = await Consultant.findById(consultantId) // get the details of the consultant
+
+    if(!consultant) { // no such consultant
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    if(!consultant.WardID) {
+        return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+    }
+
+    const wardId = consultant.WardID; // get the ward id from token
+
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
+      return res.status(404).json({error: "No such ward"})
+    }
+    
+    const ward = await Ward.findById(wardId);
+    
+    if(!ward) {
+        return res.status(404).json({error: "No such ward"})
+    }
+
     const schedule = await Schedule.create({
       year: year,
       month: month,
@@ -292,49 +352,127 @@ const setDeadline = async (req, res) => {
 }
 
 const getDoctors = async (req, res) => {
-  const filter = {}; // filter must be {ward:_id} id must be given
-  const doctors = await Doctor.find(filter);
-  const newDoctors = [];
+  const bearerHeader = req.header('Authorization'); // header
 
+  try {
+    // decode the jwt token
+    if(!bearerHeader) {
+      return res.status(401).json({ error: "Unauthorized access"})
+    }
 
-  for(let i = 0; i < doctors.length; i++) {
-    const ward = await Ward.findById(doctors[i]["WardID"]);
+    const bearer = bearerHeader.split(' ');
+    const token = bearer[1]
+    const user = jwt.verify(token, process.env.SECRET);
+
+    if(!user || user.type !== "CONSULTANT") {
+        return res.status(401).json({ error: "Unauthorized access"})
+    }
+
+    const consultantId = user._id;
+
+    if(!mongoose.Types.ObjectId.isValid(consultantId)) {
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    const consultant = await Consultant.findById(consultantId) // get the details of the consultant
+
+    if(!consultant) { // no such consultant
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    if(!consultant.WardID) {
+        return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+    }
+
+    const wardId = consultant.WardID; // get the ward id from token
+
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
+      return res.status(404).json({error: "No such ward"})
+    }
+
+    const filter = {WardID: wardId}; // filter must be {ward:_id} id must be given
+    const doctors = await Doctor.find(filter);
+    const newDoctors = [];
+    const ward = await Ward.findById(wardId);
+
+    if(!ward) { // no such ward
+      return res.status(404).json({error: "No such ward"})
+    }
+
+    for(let i = 0; i < doctors.length; i++) {
+        doctors[i]["wardName"] = ward.name;
+        doctors[i]["wardNumber"] = ward.number;
+        newDoctors.push(
+          {
+            _id: doctors[i]["_id"],
+            name: doctors[i]["name"],
+            phoneNumber: doctors[i]["phoneNumber"],
+            email: doctors[i]["email"],
+            category: doctors[i]["category"],
+            WardID: doctors[i]["WardID"],
+            "wardName": ward.name,
+            "wardNumber": ward.number
+          }
+        )
+    }
     
-      doctors[i]["wardName"] = ward.name;
-      doctors[i]["wardNumber"] = ward.number;
-      newDoctors.push(
-        {
-          _id: doctors[i]["_id"],
-          name: doctors[i]["name"],
-          phoneNumber: doctors[i]["phoneNumber"],
-          email: doctors[i]["email"],
-          category: doctors[i]["category"],
-          WardID: doctors[i]["WardID"],
-          "wardName": ward.name,
-          "wardNumber": ward.number
-        }
-      )
+  
+    return res.status(200).json(newDoctors);
+  } catch (error) {
+    return res.status(400).json({error: error.message})
   }
-
-  res.status(200).json(newDoctors);
 }
 
 const getDoctorCategories = async (req, res) => {
-  const wardId = '6339cfeed189aaa0727ebbf1';
+  const bearerHeader = req.header('Authorization'); // header
 
-  if (!mongoose.Types.ObjectId.isValid(wardId)) {
-    return res.status(404).json({error: "No such ward"})
-  }
+  try {
+    if(!bearerHeader) {
+      return res.status(401).json({ error: "Unauthorized access"})
+    }
 
-  const ward = await Ward.findById(wardId)
+    const bearer = bearerHeader.split(' ');
+    const token = bearer[1]
+    const user = jwt.verify(token, process.env.SECRET);
 
-  if(!ward) {
+    if(!user || user.type !== "CONSULTANT") {
+        return res.status(401).json({ error: "Unauthorized access"})
+    }
+
+    const consultantId = user._id;
+
+    if(!mongoose.Types.ObjectId.isValid(consultantId)) {
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    const consultant = await Consultant.findById(consultantId) // get the details of the consultant
+
+    if(!consultant) { // no such consultant
+      return res.status(404).json({error: "No such consultant"})
+    }
+
+    if(!consultant.WardID) {
+        return res.status(401).json({ error: "Unauthorized access"}) // check if status 401 is matching with the error
+    }
+
+    const wardId = consultant.WardID; // get the ward id from token
+  
+    if (!mongoose.Types.ObjectId.isValid(wardId)) {
       return res.status(404).json({error: "No such ward"})
+    }
+
+    const ward = await Ward.findById(wardId)
+
+    if(!ward) {
+        return res.status(404).json({error: "No such ward"})
+    }
+
+    const doctorCategories = ward.doctorCategories;
+
+    return res.status(200).json(doctorCategories);
+  } catch (error) {
+    return res.status(400).json({error: error.message})
   }
-
-  const doctorCategories = ward.doctorCategories;
-
-  return res.status(200).json(doctorCategories);
 }
 
 const getRequests = async (req, res) => {
@@ -359,7 +497,7 @@ const getRequests = async (req, res) => {
       console.log(data,"pass2")
       return res.status(404).json({error: "Invalid user"})
   }
-  const ward = consultant.wardId
+  const ward = consultant.WardID
   //get the other doctors requests
   const forSwappingShifts = await SwappingShifts.find({status: [2,3,4], Ward: ward});
 
@@ -523,9 +661,9 @@ const viewCalendar = async (req, res) => {
   }
   //get the doctor details according to the id
   const consultant = await Consultant.findById({ _id: id });
-  if(!doctor) {
-      return res.status(404).json({error: "Invalid user"})
-  }
+  // if(!doctor) {
+  //     return res.status(404).json({error: "Invalid user"})
+  // }
   //get the ward which is doctor belongs
   const ward = await Ward.findById(Consultant["WardID"]);
   if(!ward) {
