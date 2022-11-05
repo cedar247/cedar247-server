@@ -24,10 +24,37 @@ const doLogin = async (req,res)=>{
         //if user exits the checks the password 
         if(bcrypt.compareSync(req.body.password, user.password)){
             //if password is correct then creats a jwt token
-            const token = createToken(user._id,user.type)
-            console.log(user._id,user.type);
+            if (user.type == "Admin"){
+                const token = createToken(user._id,user.type)
+                return res.status(200).json({status:"ok", userid : user,token:token})
+            }
+            else if (user.type == "DOCTOR"){
+                const doctor = await Doctor.findOne({
+                    userId:user._id
+                })
+                if(doctor){
+                    console.log(doctor._id,doctor.userId,doctor.category);
+                    const token = createToken(doctor._id,user.type)
+                    return res.status(200).json({status:"ok", userid : user,token:token})
+                }else{
+                    return res.status(200).json({status:"Failed"})
+                }
+                
+            }
+            else if (user.type == "CONSULTANT"){
+                const consultant = await Consultant.findOne({
+                    userId:user._id
+                })
+                if(consultant){
+                    const token = createToken(consultant._id,user.type)
+                    return res.status(200).json({status:"ok", userid : user,token:token})
+                }else{
+                    return res.status(200).json({status:"Failed"})
+                }
+                
+            }
+            
             // return the token and other details
-        return res.status(200).json({status:"ok", userid : user,token:token})
         }
         
         
