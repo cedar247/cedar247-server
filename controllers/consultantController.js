@@ -625,11 +625,11 @@ const changePassword = async (req, res) => {
   console.log(consultant);
   try {
       const updateConsultant = await Consultant.findOneAndUpdate(
-        { _id: consultant["userId"] },
+        { _id: consultant._id },
         updateConsultantFileds
       );
       if (!updateConsultant) {
-        return res.status(404).json({ error: "No such workout" });
+        return res.status(404).json({ error: "No such consultant" });
       }
       //find and update the doctos email and the password
       const updateUser = await User.findOneAndUpdate(
