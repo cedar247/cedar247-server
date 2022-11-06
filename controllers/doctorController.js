@@ -7,6 +7,7 @@ const Leave = require("../models/leaveModel");
 const Shift = require("../models/shiftModel");
 const Requirement = require("../models/requirementModel");
 const ShiftOfASchedule = require("../models/shiftOfAScheduleModel");
+const SwappingShifts = require("../models/swappingShiftModel");
 const Schedule = require("../models/scheduleModel");
 const bcrypt = require('bcrypt');
 
@@ -16,7 +17,7 @@ const defineRequirements = async (req, res) => {
     const data = req.body;
     console.log(data);
 
-    const { id, date, morning, evening, night } = req.body;
+    const { id, date, shiftTypes } = req.body;
     // const _id ='633ab0f123be88c950fb8a89';
     
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -27,31 +28,17 @@ const defineRequirements = async (req, res) => {
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }
-    //get the ward which is doctor belongs
-    const ward = await Ward.findById(doctor["WardID"]);
-    if(!ward) {
-        return res.status(404).json({error: "No ward"})
-    }
-
-    const shifts = ward["shifts"];
 
     const leavedshifts = [];
     //map the data from front end with the leaves schema
-    for (let i = 0; i < shifts.length; i++) {
-        shiftDetails = await Shift.findById(shifts[i]);
+    for (let i = 0; i < data.length; i++) {
+        shiftDetails = await Shift.findById(shiftTypes[i].id);
         if(!shiftDetails) {
             return res.status(400).json({error: "Invalid shift"})
             break;
         }
-
-        if (morning && shiftDetails["name"] == "morning") {
-            leavedshifts.push(shiftDetails["_id"].toString());
-        }
-        if (evening && shiftDetails["name"] == "evening") {
-            leavedshifts.push(shiftDetails["_id"].toString());
-        }
-        if (night && shiftDetails["name"] == "night") {
-            leavedshifts.push(shiftDetails["_id"].toString());
+        if(shiftTypes[i].checked){
+            leavedshifts.push(shiftTypes[i].id)
         }
     }
 
@@ -61,6 +48,10 @@ const defineRequirements = async (req, res) => {
     };
     //create leave
     try {
+        const prerequested = await Leave.find(leave);
+        if(prerequested.length != 0){
+            return res.status(404).json({error: "Leave already requested"});
+        }
         const newleave = await Leave.create(leave);
         const requiredLeaves = [];
         requiredLeaves.push(newleave["_id"].toString());
@@ -201,7 +192,8 @@ const changePassword = async (req, res) => {
     console.log("data recieved");
     const data = req.body;
     console.log(data);
-    const id ='633ab0f123be88c950fb8a89';
+    const id = data.id;
+    // const id ='633ab0f123be88c950fb8a89';
 
     const hashedPassword = bcrypt.hashSync(data["password"],9);
     console.log(hashedPassword)
@@ -209,11 +201,13 @@ const changePassword = async (req, res) => {
         email: data["email"],
         password: hashedPassword,
     };
+    
+    const updateDoctorFileds = {
+        email: data["email"],
+    };
+
     console.log(updateFields);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: "Invalid user" });
-    }
     //get the ward which is doctor belongs
     const doctor = await Doctor.findById({ _id: data["id"] });
     if(!doctor) {
@@ -221,24 +215,430 @@ const changePassword = async (req, res) => {
     }
     // console.log(doctor);
     try {
+        const updateDoctor = await Doctor.findOneAndUpdate(
+            { _id: doctor._id },
+            updateDoctorFileds
+        );
+        if (!updateDoctor) {
+            return res.status(404).json({ error: "No such doctor" });
+        }
         //find and update the doctos email and the password
-        const updateDoctor = await User.findOneAndUpdate(
+        const updateUser = await User.findOneAndUpdate(
             { _id: doctor["userId"] },
             updateFields
         );
-        console.log(updateDoctor);
+        console.log(updateUser);
 
-        if (!updateDoctor) {
+        if (!updateUser) {
             return res.status(404).json({ error: "No such workout" });
         }
-        res.status(200).json(updateDoctor);
+        res.status(200).json(updateUser);
     } catch (error) {
         return res.status(400).json({error: error.message})
     }
 };
 
+//get the shifts belong to the ward of doctor
+const getShifts = async (req, res) => {
+
+    const id = req.body.id
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ error: "Invalid user" });
+    }
+    //get the doctor details according to the id
+    const doctor = await Doctor.findById({ _id: id });
+    if(!doctor) {
+        return res.status(404).json({error: "Invalid user"})
+    }
+    //get the ward which is doctor belongs
+    const ward = await Ward.findById(doctor["WardID"]);
+    if(!ward) {
+        return res.status(404).json({error: "No ward"})
+    }
+    const shifts = ward.shifts;
+    if (shifts === []) {
+        return res.status(200).json({ msg: "No shifts" })
+    }
+
+    const shiftDetails = [];
+    for (let i = 0; i < shifts.length; i++) {
+        const shiftId = shifts[i]
+        if (!mongoose.Types.ObjectId.isValid(shiftId)) {
+            console.log("No such shift")
+        } else {
+            const shift = await Shift.findById(shiftId)
+            if (!shift) {
+                console.log("No such shift")
+            } else {
+                shiftDetails.push(shift)
+            }
+        }
+    }
+    return res.status(200).json(shiftDetails)
+}
+
+//get shiftOfSchedules of given dates and return coresponding shift of schedules
+const getDoctorShifts = async (req, res) => {
+    const data = req.body;
+    const id = data.id
+    const fromDate = data.fromDate.substr(0, 10);
+    const toDate = data.toDate.substr(0, 10);
+    console.log(data)
+    console.log("data recieved");
+
+    // const _id ='633ab0f123be88c950fb8a89';
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        console.log(data,"pass1")
+        return res.status(404).json({ error: "Invalid user" });
+    }
+
+    const doctor = await Doctor.findById({ _id: data["id"] });
+    if(!doctor) {
+        console.log(data,"pass2")
+        return res.status(404).json({error: "Invalid user"})
+    }
+    //get the ward which is doctor belongs
+    const ward = await Ward.findById(doctor["WardID"]);
+    if(!ward) {
+        console.log(data,"pass2")
+        return res.status(404).json({error: "No ward"});
+    }
+
+    const alldoctors = {};
+    for (let i = 0; i < ward["doctors"].length; i++) {
+        doctorDetails = await Doctor.findById(ward["doctors"][i]);
+        if(!doctorDetails) {
+            return res.status(404).json({error: "Doctor not found"})
+            break;
+        }
+        alldoctors[ward["doctors"][i]] = doctorDetails["name"];
+    }
+
+    const fromShiftOfSchedules = await ShiftOfASchedule.find({ date: fromDate, ward: ward });
+    // console.log(fromShiftOfSchedules);
+    if(fromShiftOfSchedules.length == 0){
+        console.log(data,"pass3")
+        return res.status(404).json({error: "no shift Of Schedule"});
+    }
+
+    const toShiftOfSchedules = await ShiftOfASchedule.find({ date: toDate, ward: ward });
+    // console.log(toShiftOfSchedules);
+    if(toShiftOfSchedules.length == 0){
+        console.log(data,"pass4")
+        return res.status(404).json({error: "no shift Of Schedule"});
+    }
+
+    
+    const returnFromShiftofSchedules = []
+    for (let i = 0; i < fromShiftOfSchedules.length; i++) {
+        const shiftOfSchedule = fromShiftOfSchedules[i]
+        console.log(data,"pass5")
+        if(shiftOfSchedule["doctors"].includes(id)){
+            console.log(data,"pass6")
+            shiftDetails = await Shift.findById(shiftOfSchedule["shift"]);
+            if(!shiftDetails) {
+                return res.status(400).json({error: "Invalid shift"})
+                break;
+            }
+            const tempDoctors = []
+            for (let j = 0; j < shiftOfSchedule["doctors"].length; j++) {
+                console.log(data,"pass7")
+                doctorId = shiftOfSchedule["doctors"][j]
+                if(id != doctorId){
+                    tempDoctors.push({id: doctorId, name: alldoctors[doctorId]});
+                }
+            }
+            console.log(tempDoctors);
+            returnFromShiftofSchedules.push({
+                id : shiftOfSchedule["_id"],
+                doctors : tempDoctors,
+                shift: shiftDetails,
+            })
+        }
+    }
+    console.log(returnFromShiftofSchedules);
+    if(returnFromShiftofSchedules.length == 0){
+        console.log(data,"pass8")
+        return res.status(404).json({error: "no shift Of Schedule"})
+    }
+    console.log("pass11");
+
+    const returnToShiftofSchedules = []
+    for (let i = 0; i < toShiftOfSchedules.length; i++) {
+        const shiftOfSchedule = toShiftOfSchedules[i]
+        console.log(shiftOfSchedule, "pass12");
+
+        if(!shiftOfSchedule["doctors"].includes(id)){
+            console.log("pass13");
+            shiftDetails = await Shift.findById(shiftOfSchedule["shift"]);
+            if(!shiftDetails) {
+                return res.status(400).json({error: "Invalid shift"})
+                break;
+            }
+            const tempDoctors = []
+            for (let j = 0; j < shiftOfSchedule["doctors"].length; j++) {
+                doctorId = shiftOfSchedule["doctors"][j]
+                tempDoctors.push({id: doctorId, name: alldoctors[doctorId]});
+            }
+            console.log(tempDoctors);
+            returnToShiftofSchedules.push({
+                id : shiftOfSchedule["_id"],
+                doctors : tempDoctors,
+                shift: shiftDetails,
+            })
+        }
+    }
+    console.log("pass14");
+    console.log(returnToShiftofSchedules);
+    if(returnToShiftofSchedules.length == 0){
+        return res.status(404).json({error: "no shift Of Schedule"})
+    }
+
+    console.log("pass17");
+    return res.status(200).json([returnFromShiftofSchedules,returnToShiftofSchedules])
+};
+
+
+const setSwappingShifts = async (req, res) => {
+    const data = req.body;
+    const fromDoctor = data.id
+    const fromShiftofSchedule = data.fromShiftofSchedule
+    const toShiftofSchedule = data.toShiftofSchedule
+    const toDoctor = data.doctor
+    console.log(data)
+    console.log("data recieved");
+
+    // const _id ='633ab0f123be88c950fb8a89';
+
+    if (!mongoose.Types.ObjectId.isValid(fromDoctor)) {
+        console.log(data,"pass1")
+        return res.status(404).json({ error: "Invalid user" });
+    }
+    
+    const doctor = await Doctor.findById({ _id: fromDoctor });
+    if(!doctor) {
+        console.log(data,"pass2")
+        return res.status(404).json({error: "Invalid user"})
+    }
+    const ward = doctor.WardID;
+    console.log("pass1")
+
+    if (!mongoose.Types.ObjectId.isValid(fromShiftofSchedule)) {
+        console.log(data,"pass1")
+        return res.status(404).json({ error: "Invalid ShiftofSchedule" });
+    }
+    console.log("pass2")
+
+    if (!mongoose.Types.ObjectId.isValid(toShiftofSchedule)) {
+        console.log(data,"pass1")
+        return res.status(404).json({ error: "Invalid ShiftofSchedule" });
+    }
+    console.log("pass3")
+
+    if (!mongoose.Types.ObjectId.isValid(toDoctor)) {
+        console.log(data,"pass1")
+        return res.status(404).json({ error: "Invalid user" });
+    }
+    console.log("pass4")
+
+    const SwappingShift ={
+        fromDoctor: fromDoctor,
+        fromShiftofSchedule: fromShiftofSchedule,
+        toShiftofSchedule: toShiftofSchedule,
+        toDoctor: toDoctor,
+        ward: ward,
+        status: 0,
+    }
+
+    
+    try{
+        const existingSwappingShift = await SwappingShifts.find({
+            fromDoctor: fromDoctor,
+            fromShiftofSchedule: fromShiftofSchedule,
+            toShiftofSchedule: toShiftofSchedule,
+            toDoctor: toDoctor,
+            ward: ward,
+        });
+        console.log(SwappingShift)
+
+        if(existingSwappingShift.length == 0){
+            const newSwappingShift = await SwappingShifts.create(SwappingShift);
+            res.status(200).json("Successfull");
+        }else{
+            res.status(400).json({error: "swapping requiest is exists"});
+        }
+
+    } catch (error) {
+        return res.status(400).json({error: error.message})
+    }
+}
+
+
+const getRequests = async (req, res) => {
+    const id = req.body.id;
+    // const id = new mongoose.Types.ObjectId("633ab54a9fd528b9532b8d59");
+    // const id = "633ab0f123be88c950fb8a89";
+    const fromRequests = [];
+    const toRequests = [];
+
+    console.log(id)
+    console.log("data recieved");
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ error: "Invalid user" });
+    }
+    const doctor = await Doctor.findById({ _id: id });
+    if(!doctor) {
+        return res.status(404).json({error: "Invalid user"})
+    }
+    const  ward = doctor.WardID
+    // console.log({ toDoctor: id, ward:ward } )
+    //get the other doctors requests
+    const forSwappingShifts = await SwappingShifts.find({ toDoctor: id, ward:ward });
+console.log(forSwappingShifts)
+    for (let i = 0; i < forSwappingShifts.length; i++) {
+        const forSwappingShift = forSwappingShifts[i];
+
+        const fromDoctor = await Doctor.findById({ _id: forSwappingShift.fromDoctor });
+        if(!fromDoctor) {
+            return res.status(404).json({error: "Invalid user"})
+        }
+
+        const toShiftofSchedule = await ShiftOfASchedule.findById({ _id: forSwappingShift.fromShiftofSchedule });
+        if(!toShiftofSchedule) {
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+
+        const toShift = await Shift.findById({ _id: toShiftofSchedule.shift });
+        if(!toShift) {
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+        const fromShiftofSchedule = await ShiftOfASchedule.findById({ _id: forSwappingShift.toShiftofSchedule });
+        if(!fromShiftofSchedule) {
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+
+        const fromShift = await Shift.findById({ _id: fromShiftofSchedule.shift });
+        if(!fromShift) {
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+    
+        const SwappingShift = {
+            id: forSwappingShift._id,
+            name: fromDoctor.name,
+            fromDate: fromShiftofSchedule.date,
+            fromShiftName: fromShift.name,
+            fromShift: fromShift.startTime.concat(' - ', fromShift.endTime),
+            toDate: toShiftofSchedule.date,
+            toShiftName: toShift.name,
+            toShift: toShift.startTime.concat(' - ', toShift.endTime),
+            status: forSwappingShift.status
+        }
+
+        fromRequests.push(SwappingShift)
+    }
+    console.log(fromRequests)
+    //get the request of corresponding doctor
+    const toSwappingShifts = await SwappingShifts.find({ fromDoctor: id, ward:ward });
+
+    for (let i = 0; i < toSwappingShifts.length; i++) {
+        const toSwappingShift = toSwappingShifts[i];
+        console.log(toSwappingShift)
+        const toDoctor = await Doctor.findById({ _id: toSwappingShift.toDoctor });
+        if(!toDoctor) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid user"})
+        }
+        console.log(toSwappingShift.toShiftofSchedule)
+
+        const fromShiftofSchedule = await ShiftOfASchedule.findById({ _id: toSwappingShift.fromShiftofSchedule });
+        if(!fromShiftofSchedule) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+        console.log(fromShiftofSchedule)
+
+        const fromShift = await Shift.findById({ _id: fromShiftofSchedule.shift });
+        if(!fromShift) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+        
+        const toShiftofSchedule = await ShiftOfASchedule.findById({ _id: toSwappingShift.toShiftofSchedule });
+        if(!toShiftofSchedule) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid ShiftofSchedule"})
+        }
+
+        const toShift = await Shift.findById({ _id: toShiftofSchedule.shift });
+        if(!toShift) {
+            console.log(data,"pass2")
+            return res.status(404).json({error: "Invalid Shift"})
+        }
+    
+        const SwappingShift = {
+            name: toDoctor.name,
+            fromDate: fromShiftofSchedule.date,
+            fromShiftName: fromShift.name,
+            fromShift: fromShift.startTime.concat(' - ', fromShift.endTime),
+            toDate: toShiftofSchedule.date,
+            toShiftName: toShift.name,
+            toShift: toShift.startTime.concat(' - ', toShift.endTime),
+            status: toSwappingShift.status
+        }
+
+        toRequests.push(SwappingShift)
+    }
+
+    console.log(fromRequests)
+    console.log(toRequests)
+    res.status(200).json([fromRequests,toRequests]);
+
+}
+
+const setRequestResponse = async (req, res) => {
+
+    const data = req.body;
+    const requestId = data.requestId;
+    const agree = data.Agree;
+    console.log(data)
+    console.log("data recieved");
+
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+        return res.status(404).json({ error: "Invalid Swappingshift" });
+    }
+    //get the Swappingshift details according to the id
+    const SwappingShift = await SwappingShifts.findById({ _id: requestId });
+    if(!SwappingShift) {
+        return res.status(404).json({error: "Invalid Swappingshift"})
+    } 
+    const updateFields = {}
+    if (agree){
+        updateFields["status"]= 2;
+    }else{
+        updateFields["status"]= 1;
+    }
+    console.log(updateFields)
+    try {
+        const newSwappingShift = await SwappingShifts.findOneAndUpdate( { _id: requestId }, updateFields);
+        if (!newSwappingShift) {
+            return res.status(404).json({ error: "No such swapping shift" });
+        }
+        return res.status(200).json(newSwappingShift)
+    } catch (error) {
+        return res.status(400).json({error: error.message})
+    }
+}
+
 module.exports = {
     defineRequirements,
     changeClendar,
     changePassword,
+    getShifts,
+    getDoctorShifts,
+    setSwappingShifts,
+    getRequests,
+    setRequestResponse,
 };
