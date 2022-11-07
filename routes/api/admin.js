@@ -12,7 +12,10 @@ const{
     CreateUser,
     setConstraints,
     getNumConsecGroups,
-    setConsecGroups
+    setConsecGroups,
+    getWardConsultants,
+    getWardDoctors,
+    DeleteWard
 } = require('../../controllers/adminController')
 
 
@@ -31,12 +34,14 @@ router.post('/add-ward', addWard)// to add a new ward
 router.post('/user', CreateUser)// to create a new user
 
 router.get('/getAll',getAllWardDetails)// to get all ward details
-router.get('/getDoctorTypes',getDoctorTypes)// to get the types of the doctor
+router.post('/getDoctorTypes',getDoctorTypes)// to get the types of the doctor
 router.post("/set-constraints", setConstraints) // set constraints
 router.post("/set-consec-groups", setConsecGroups) // set consecutive groups
 router.get('/',getWards)// to get wards
 router.get('/:id',getConsultant)//to get one consultant
-
+router.post('/getAllCons',getWardConsultants)//to get ward consultant
+router.post('/getAllDocs',getWardDoctors)//to get one consultant
+router.post('/DeleteWard',DeleteWard)
 
 
 module.exports = router
