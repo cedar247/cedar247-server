@@ -20,6 +20,35 @@ const getConsultants = async (req, res) => {
 
 }
 
+// to get all consultant 
+const getWardConsultants = async (req, res) => {
+    console.log("All doc in ksdjlkajslkdf controller");
+    console.log(req.body)
+
+    try {
+        const consultant = await Consultant.find({WardID:req.body._id}).sort({ createdAt: -1 })
+
+        res.status(200).json(consultant)
+    } catch (error) {
+        res.status(400).json({ msg: error.message })
+    }
+
+}
+
+// to get all consultant 
+const getWardDoctors = async (req, res) => {
+    console.log("All doc in      vksdfasdifi controller");
+    console.log(req.body)
+    try {
+        const doctor = await Doctor.find({WardID:req.body._id}).sort({ createdAt: -1 })
+
+        res.status(200).json(doctor)
+    } catch (error) {
+        res.status(400).json({ msg: error.message })
+    }
+
+}
+
 
 // to get all ward names
 const getWards = async (req, res) => {
@@ -33,14 +62,28 @@ const getWards = async (req, res) => {
     }
 
 }
+
+const DeleteWard = async (req, res) => {
+    console.log(req.body);
+    console.log('Hi i am gghere');
+    try {
+        const ward = await Ward.deleteOne({_id:req.body.wardID})
+
+        res.status(200).json(ward)
+    } catch (error) {
+        res.status(400).json({ msg: error.message })
+    }
+
+}
 // to get the doctor types
 const getDoctorTypes = async (req, res) => {
-    const wardId = '6339cfeed189aaa0727ebbf1'
-
+    const wardId = req.body.WardID
+    console.log('HI there');
+    console.log(req.body);
 
     try {
         const ward = await Ward.findById(wardId); // get the ward
-
+        // const ward = await Ward.findById(req.body.wardID);
         if(!ward) {
             return res.status(404).json({error: "No such ward"})
         }
@@ -540,5 +583,9 @@ module.exports = {
     CreateUser,
     setConstraints,
     getNumConsecGroups,
-    setConsecGroups
+    setConsecGroups,
+    getWardConsultants,
+    getWardDoctors,
+    DeleteWard
+    
 }
