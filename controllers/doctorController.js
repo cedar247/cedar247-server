@@ -181,7 +181,7 @@ const changeClendar = async (req, res) => {
             }
         }
     }
-    console.log(appoinments, owners, " done");
+    console.log([appointments, owners], " done");
     // console.log(appointments, owners);
     //return the appoinment and owners list
     res.status(200).json([appointments, owners]);
