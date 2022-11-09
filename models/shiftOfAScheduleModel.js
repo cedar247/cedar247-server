@@ -14,8 +14,12 @@ const shiftOfAScheduleSchema = new Schema({
     date: {
         type: String,
         required: true
-    }
-
+    },
+    ward:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ward',
+        required: true
+    },
 }, { timestamps: true })
 
 
