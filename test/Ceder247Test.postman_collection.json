@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "c6eb4a63-1461-4667-b662-18e8bcebb0bb",
+		"name": "ceder247Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23553478"
+	},
+	"item": [
+		{
+			"name": "changeClendar show doctor calendar",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"633ab0f123be88c950fb8a89\",\r\n    \"allawAllDoctors\":false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/changeClendar",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"changeClendar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "changeClendar show all shecules",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"633ab0f123be88c950fb8a89\",\r\n    \"allawAllDoctors\":false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/changeClendar",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"changeClendar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "changePassword",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\" : \"633ab0f123be88c950fb8a89\",\r\n    \"email\": \"abcd@gmail.com\",\r\n    \"password\":\"Abcd@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/changePassword",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"changePassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "defineRequirements",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":\"633ab0f123be88c950fb8a89\",\r\n    \"date\":\"2022-10-14\",\r\n    \"morning\": true,\r\n    \"evening\": false,\r\n    \"night\":true\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/defineRequirements",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"defineRequirements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "setSwappingShifts",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": \"633ab0f123be88c950fb8a89\",\r\n  \"fromShiftofSchedule\": \"63351516df919f17849a6d85\",\r\n  \"toShiftofSchedule\": \"633518fe88caa1f4cc6d3107\",\r\n  \"doctor\": \"633ab54a9fd528b9532b8d59\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/setSwappingShifts",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"setSwappingShifts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getDoctorShifts",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": \"633ab54a9fd528b9532b8d59\",\r\n  \"fromDate\": \"2022-10-12T06:59:48.000Z\",\r\n  \"toDate\": \"2022-10-15T06:59:48.000Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/getDoctorShifts",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"getDoctorShifts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getShifts",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":\"633ab0f123be88c950fb8a89\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/getShifts",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"getShifts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRequests",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":\"633ab0f123be88c950fb8a89\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/getRequests",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"getRequests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "setRequestResponse",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestId\": \"63659d816e7741c49acb48fd\",\r\n    \"Agree\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/doctor/setRequestResponse",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"doctor",
+						"setRequestResponse"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

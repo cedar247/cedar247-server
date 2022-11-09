@@ -1,27 +1,52 @@
 const express = require('express')
 const {
-    createWorkout,
-    getWorkout,
-    getWorkouts,
-    deleteWorkout,
-    updateWorkout
+    addWard,
+    addShift,
+    addLeave,
+    addRequirement,
+    addShiftOfSchedule,
+    addSchedule
+
 } = require('../controllers/workoutController')
 
 const router = express.Router()
 
-router.get('/', getWorkouts)
+//add a new ward
+router.post('/addWard', addWard)
+router.post('/addShift', addShift)
+router.post('/addLeave', addLeave)
+router.post('/addRequirement', addRequirement)
+router.post('/addShiftOfSchedule', addShiftOfSchedule)
+router.post('/addSchedule', addSchedule)
 
 
-// GET a single workout
-router.get('/:id', getWorkout)
+
+
+
+// router.get('/', getWorkouts)
+
+
+// // GET a single workout
+// router.get('/:id', getWorkout)
 
 // POST a new workout
-router.post('/', createWorkout)
+// router.get('/', getWorkouts)
 
-// DELETE a workout
-router.delete('/:id', deleteWorkout)
 
-// UPDATE a workout
-router.patch('/:id', updateWorkout)
+// // GET a single workout
+// router.get('/:id', getWorkout)
+
+// // POST a new workout
+
+// router.post('/', createWorkout)
+
+// // DELETE a workout
+// router.delete('/:id', deleteWorkout)
+
+// // UPDATE a workout
+// router.patch('/:id', updateWorkout)
+
+
+router.get('/add-ward', addWard)
 
 module.exports = router
