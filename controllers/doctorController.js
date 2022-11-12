@@ -50,7 +50,7 @@ const defineRequirements = async (req, res) => {
     try {
         const prerequested = await Leave.find(leave);
         if(prerequested.length != 0){
-            return res.status(404).json({error: "Leave already requested"});
+            return res.status(400).json({error: "Leave already requested"});
         }
         const newleave = await Leave.create(leave);
         const requiredLeaves = [];
