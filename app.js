@@ -4,11 +4,11 @@ var cors = require('cors')
 const session = require('express-session')
 
 // import routes
-const workoutRoutes = require("./routes/workouts")
-const adminRoutes = require('./routes/api/admin')
-const consultantRoutes = require('./routes/api/consultant')
+// const workoutRoutes = require("./routes/workouts")
+// const adminRoutes = require('./routes/api/admin')
+// const consultantRoutes = require('./routes/api/consultant')
 const doctorRoutes = require('./routes/api/doctor')
-const authRoutes = require('./routes/auth')
+// const authRoutes = require('./routes/auth')
 
 // express app
 const app = express()
