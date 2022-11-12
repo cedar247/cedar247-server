@@ -6,7 +6,6 @@ require("dotenv").config();
 
 /* Connecting to the database before each test. */
 beforeEach(async () => {
-    jest.setTimeout(30000);
     await mongoose.connect(process.env.MONGO_URI);
 });
 
@@ -16,6 +15,7 @@ afterEach(async () => {
 });
 
 describe("POST /api/doctor/getShifts", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/getShifts").send({
             id: "633ab0f123be88c950fb8a89",
@@ -25,6 +25,7 @@ describe("POST /api/doctor/getShifts", () => {
     });
 });
 describe("POST /api/doctor/changeClendar", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/changeClendar").send({
             "id": "633ab0f123be88c950fb8a89",
@@ -39,6 +40,7 @@ describe("POST /api/doctor/changeClendar", () => {
     });
 });
 describe("POST /api/doctor/changeClendar", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/changeClendar").send({
             "id": "633ab0f123be88c950fb8a89",
@@ -53,6 +55,7 @@ describe("POST /api/doctor/changeClendar", () => {
     });
 });
 describe("POST /api/doctor/changePassword", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/changePassword").send({
             "id" : "633ab0f123be88c950fb8a89",
@@ -65,6 +68,7 @@ describe("POST /api/doctor/changePassword", () => {
     });
 });
 describe("POST /api/doctor/defineRequirements", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/defineRequirements").send({
             "id":"633ab0f123be88c950fb8a89",
@@ -82,6 +86,7 @@ describe("POST /api/doctor/defineRequirements", () => {
     });
 });
 describe("POST /api/doctor/setSwappingShifts", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/setSwappingShifts").send({
             "id": "633ab0f123be88c950fb8a89",
@@ -98,6 +103,7 @@ describe("POST /api/doctor/setSwappingShifts", () => {
     });
 });
 describe("POST /api/doctor/getDoctorShifts", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/getDoctorShifts").send({
             "id": "633ab54a9fd528b9532b8d59",
@@ -114,6 +120,7 @@ describe("POST /api/doctor/getDoctorShifts", () => {
     });
 });
 describe("POST /api/doctor/getRequests", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/getRequests").send({
             id: "633ab0f123be88c950fb8a89",
@@ -126,6 +133,7 @@ describe("POST /api/doctor/getRequests", () => {
     });
 });
 describe("POST /api/doctor/setRequestResponse", () => {
+    jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/setRequestResponse").send({
             "requestId": "63659d816e7741c49acb48fd",
