@@ -54,7 +54,7 @@ const getWardDoctors = async (req, res) => {
 const getWards = async (req, res) => {
 
     try {
-        const consultant = await Ward.find({}, { name: 1 }).sort({ createdAt: -1 })
+        const consultant = await Ward.find({status: 2}, { name: 1 }).sort({ createdAt: -1 })
 
         res.status(200).json(consultant)
     } catch (error) {
@@ -106,7 +106,7 @@ const getDoctorTypes = async (req, res) => {
 const getAllWardDetails = async (req, res) => {
 
     try {
-        const consultant = await Ward.find({}).sort({})
+        const consultant = await Ward.find({status: 2}).sort({})
 
         res.status(200).json(consultant)
     } catch (error) {
@@ -318,13 +318,13 @@ const addWard = async (req, res) => {
         }
 
         // check if ward name exists in the system
-        const ward_exist = await Ward.findOne({name: name})
+        const ward_exist = await Ward.findOne({name: name, status:2})
 
         if(ward_exist) { 
             return res.status(200).json({error: "Ward name exists"})
         }
 
-        const ward_exist_num = await Ward.findOne({number: number})
+        const ward_exist_num = await Ward.findOne({number: number, status:2})
 
         if(ward_exist_num) {
             return res.status(200).json({error: "Ward number exists"})
@@ -367,7 +367,8 @@ const addWard = async (req, res) => {
             number: number,
             shifts: shiftIds,
             doctorCategories: categories,
-            constraints: constraints
+            constraints: constraints,
+            status: 1
         }) // create the ward
 
         const wardCreated = await Ward.create(ward)
@@ -460,7 +461,8 @@ const setConstraints = async (req, res) => {
         constraints.consecutiveGroups = consecGroups;
         console.log(constraints)
         const wardUpdated = await Ward.findOneAndUpdate({_id: wardId}, {
-            constraints: constraints
+            constraints: constraints,
+            status: 2
         });
 
         return res.status(201).json({msg: "success"})
