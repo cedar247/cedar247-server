@@ -84,7 +84,6 @@ const getDoctorTypes = async (req, res) => {
 
     try {
         const ward = await Ward.findById(wardId); // get the ward
-        // const ward = await Ward.findById(req.body.wardID);
         if(!ward) {
             return res.status(404).json({error: "No such ward"})
         }
@@ -92,9 +91,6 @@ const getDoctorTypes = async (req, res) => {
         const doctorCategories = ward.doctorCategories
         console.log(doctorCategories)
 
-        // const doctor = await Doctor.find({}, { category: 1 }).distinct('category')
-
-        // res.status(200).json(doctor)
         res.status(200).json(doctorCategories)
     } catch (error) {
         res.status(400).json({ msg: error.message })
