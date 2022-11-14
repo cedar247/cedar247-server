@@ -11,6 +11,9 @@ const wardSchema = new Schema({
         type: Number,
         required: true
     },
+    status: {
+        type: Number
+    },
     currentScheduleID : {
         type: Schema.Types.ObjectId,
         ref: 'Schedule'
