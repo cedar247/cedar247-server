@@ -229,6 +229,7 @@ const createSchedule = async (req, res) => {
       const rosters = response.data
       const numDays = new Date(year, month, 0).getDate()
       console.log(numDays)
+      const shift_data = []
 
       for(let i = 0; i < numDays; i++) { // iterate all number of days
         for(let j = 0; j < shift_types.length; j++) { // iterate through shifts
@@ -236,6 +237,7 @@ const createSchedule = async (req, res) => {
           const date = rosters[0][i][0]
           const shift = shift_types[j]
           const doctors_all = [] // doctors of all categories
+          
           for(let k = 0; k < doctorCategories.length; k++) {
             const doctors = rosters[k][i][j+1]
 
@@ -255,9 +257,18 @@ const createSchedule = async (req, res) => {
               ward: wardId
             }
           )
+
+          // add id of shiftOfASchedule to data array
+          shift_data.push(shiftOfASchedule._id)
         }
       }
-      
+
+      const schedule = await Schedule.findOneAndUpdate(
+        {_id: scheduleID},
+        {
+          data: shift_data
+        }
+      )
       return res.status(201).json({msg: "schedule successfully created!!!"})
     }
     
