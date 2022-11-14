@@ -68,10 +68,11 @@ const DeleteWard = async (req, res) => {
     console.log('Hi i am gghere');
     try {
         const ward = await Ward.deleteOne({_id:req.body.wardID})
-
-        res.status(200).json(ward)
+        const cons = await Consultant.deleteMany({WardID:req.body.wardID})
+        const doc = await Doctor.deleteMany({WardID:req.body.wardID})
+        res.status(200).json(ward);
     } catch (error) {
-        res.status(400).json({ msg: error.message })
+        return res.status(400).json({ msg: error.message })
     }
 
 }
