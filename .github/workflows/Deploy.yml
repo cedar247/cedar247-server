@@ -19,17 +19,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Heroku Docker Container Deploy
-      # You may pin to the exact commit or the version.
-      # uses: lucassarcanjo/heroku-deploy@1db4c62f6032efe526c12734f18d36669218e5af
-      uses: lucassarcanjo/heroku-deploy@2.1.17
-      with:
-        # Email Linked to your Heroku Account
-        email: rosterscheduler@gmail.com
-        # Heroku Dyno Formation
-        # Your Heroku API Key
-        api_key: 836e6d7d-91fb-4bf9-992f-74fb5457133b
-        # Your Heroku App Name
-        app_name: cedar247
-        # Dokerfile path
-        dockerfile_path: cedar247-server
-        # Optional build parameters
+    - run : git remote add heroku https://heroku:${{secreats.HEROKU_API_KEY}}@git.heroku.com/cedar247.git
+    - name : deploy
+    - run : git push heroku HEAD:Server_deploy -f
