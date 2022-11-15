@@ -77,9 +77,9 @@ const createSchedule = async (req, res) => {
     const current_date = new Date() // current date
 
     // compare deadline with current date
-    if(current_date < deadline) {
-      return res.status(200).json({ error: "Cannot create the schedule before the deadline"})
-    }
+    // if(current_date < deadline) {
+    //   return res.status(200).json({ error: "Cannot create the schedule before the deadline"})
+    // }
 
     if(schedule.status === 2) { // schedule has been already created
       return res.status(200).json({ error: "Schedule already had been created"})
@@ -273,18 +273,21 @@ const createSchedule = async (req, res) => {
             }
           }
 
-          // add shiftOfASchedule to database
-          const shiftOfASchedule = await ShiftOfASchedule.create(
-            {
-              doctors: doctors_all,
-              shift: shift,
-              date: date,
-              ward: wardId
-            }
-          )
+          if(doctors_all.length !== 0) {
+            // add shiftOfASchedule to database
+            const shiftOfASchedule = await ShiftOfASchedule.create(
+              {
+                doctors: doctors_all,
+                shift: shift,
+                date: date,
+                ward: wardId
+              }
+            )
 
-          // add id of shiftOfASchedule to data array
-          shift_data.push(shiftOfASchedule._id)
+            // add id of shiftOfASchedule to data array
+            shift_data.push(shiftOfASchedule._id)
+          }
+          
         }
       }
 
