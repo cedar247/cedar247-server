@@ -754,11 +754,11 @@ const viewCalendar = async (req, res) => {
   }
   //get the doctor details according to the id
   const consultant = await Consultant.findById({ _id: id });
-  // if(!doctor) {
-  //     return res.status(404).json({error: "Invalid user"})
-  // }
+  if(!consultant) {
+      return res.status(404).json({error: "Invalid user"})
+  }
   //get the ward which is doctor belongs
-  const ward = await Ward.findById(Consultant["WardID"]);
+  const ward = await Ward.findById(consultant["WardID"]);
   if(!ward) {
       return res.status(404).json({error: "No ward"})
   }
