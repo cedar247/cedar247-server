@@ -73,6 +73,17 @@ const createSchedule = async (req, res) => {
     const scheduleID = ward.currentScheduleID; // get current schedule Id of the ward
   
     const schedule = await Schedule.findById(scheduleID);
+    const deadline = new Date(schedule.deadline)
+    const current_date = new Date() // current date
+
+    // compare deadline with current date
+    if(current_date < deadline) {
+      return res.status(200).json({ error: "Cannot create the schedule before the deadline"})
+    }
+
+    if(schedule.status === 2) { // schedule has been already created
+      return res.status(200).json({ error: "Schedule already had been created"})
+    }
   
     if(!schedule) { // check whether the schedule is exists in the database
       return res.status(404).json({error: "No such schedule"})
@@ -91,6 +102,7 @@ const createSchedule = async (req, res) => {
         }
       }
 
+      
       const requirement = await consultantRequirement.create(reqAddingDetails)
       const requirementId = requirement._id;
       requirementIds.push(requirementId)
@@ -223,9 +235,22 @@ const createSchedule = async (req, res) => {
         year: year,
         month: month
       }
+
+      console.log(data)
+      // return 
+
+      // validate data before sending to flask application
+      for(let category in num_doctors){ // iterate through category
+        for(let [shiftId, number] of Object.entries(num_doctors[category])){
+          if(number > doctors_details[category].length) {
+            const error = "Number of " + category + " are not enough";
+            return res.status(200).json({error: error})
+          }
+        }
+      }
       
 
-      const response = await axios.post('http://localhost:5000/schedule', data)
+      const response = await axios.post(process.env.FLASK_APP_URI, data)
       const rosters = response.data
       const numDays = new Date(year, month, 0).getDate()
       console.log(numDays)
@@ -266,7 +291,8 @@ const createSchedule = async (req, res) => {
       const schedule = await Schedule.findOneAndUpdate(
         {_id: scheduleID},
         {
-          data: shift_data
+          data: shift_data,
+          status: 2
         }
       )
       return res.status(201).json({msg: "schedule successfully created!!!"})
@@ -277,6 +303,25 @@ const createSchedule = async (req, res) => {
     return res.status(400).json({error: error.message})
   }
   
+
+}
+
+const validateDeadline = (year, month, deadline) => {
+  const current_date = new Date(); // current date
+  const current_month = current_date.getMonth() + 1;
+  const current_year = current_date.getFullYear(); // current year
+  const current_day = current_date.getDate()
+
+  const deadline_month = deadline.getMonth() + 1;
+  const deadline_year = deadline.getFullYear();
+
+  const schedule_date = new Date(year, month - 1, 1)
+
+  if(current_date.getTime() < deadline.getTime() && deadline.getTime() < schedule_date.getTime()) {
+    return true
+  }
+
+  return false
 
 }
 
@@ -329,12 +374,38 @@ const setDeadline = async (req, res) => {
         return res.status(404).json({error: "No such ward"})
     }
 
+    // check current schedule is set to same 
+
+    // validate schedule month
+    // check schedule month is in future
+    const valid_deadline = validateDeadline(parseInt(year), parseInt(month), new Date(deadline))
+    if(!valid_deadline) {
+      return res.status(200).json({error: "Invalid deadline or schedule month"})
+    }
+
+    // check whether schedule is already created for schedule month
+    const schedule_already_created = await Schedule.findOne({ward: wardId, year: year, month: month, status: 2})
+    console.log(schedule_already_created)
+    if(schedule_already_created) {
+      return res.status(200).json({error: "Schedule already has been created for given schedule month"})
+    }
+
+    // check whether deadline is already set for given schedule month but haven't created the schedule 
+    // update the deadline of that schedule
+    const deadline_already_set = await Schedule.findOne({ward: wardId, year: year, month: month, status: 1})
+    if(deadline_already_set) {
+      const deadline_update = await Schedule.findOneAndUpdate({_id: deadline_already_set._id}, {
+        deadline: deadline
+      })
+      return res.status(201).json({msg: "Deadline is already set for schedule month, deadline updated"})
+    }
+
     const schedule = await Schedule.create({
       year: year,
       month: month,
       deadline: deadline,
       ward: wardId,
-      status: 0
+      status: 1
     });
 
     const scheduleId = schedule._id;
@@ -356,7 +427,7 @@ const setDeadline = async (req, res) => {
       return res.status(404).json({error: "No such ward"})
     }
 
-    return res.status(201).json({msg: "success"})
+    return res.status(201).json({msg: "Deadline has been set successfully!"})
   } catch (error) {
     return res.status(400).json({error: error.message})
   }
