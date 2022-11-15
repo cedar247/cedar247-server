@@ -26,12 +26,10 @@ jobs:
         # Email Linked to your Heroku Account
         email: rosterscheduler@gmail.com
         # Heroku Dyno Formation
-        formation: # optional, default is web
         # Your Heroku API Key
         api_key: 836e6d7d-91fb-4bf9-992f-74fb5457133b
         # Your Heroku App Name
         app_name: cedar247
         # Dokerfile path
-        dockerfile_path: .
+        dockerfile_path: cedar247-server
         # Optional build parameters
-        options: # optional
