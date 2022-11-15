@@ -32,6 +32,6 @@ jobs:
         # Your Heroku App Name
         app_name: cedar247
         # Dokerfile path
-        dockerfile_path: ../../
+        dockerfile_path: .
         # Optional build parameters
         options: # optional
