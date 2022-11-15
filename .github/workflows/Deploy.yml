@@ -1,0 +1,24 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+- name: Heroku Docker Container Deploy
+
+on:
+  push:
+    branches: [ Server_deploy ]
+  # You may pin to the exact commit or the version.
+  # uses: lucassarcanjo/heroku-deploy@1db4c62f6032efe526c12734f18d36669218e5af
+  uses: lucassarcanjo/heroku-deploy@2.1.17
+  with:
+    # Email Linked to your Heroku Account
+    email: rosterscheduler@gmail.com
+    # Heroku Dyno Formation
+    formation: # optional, default is web
+    # Your Heroku API Key
+    api_key: 836e6d7d-91fb-4bf9-992f-74fb5457133b
+    # Your Heroku App Name
+    app_name: cedar247
+    # Dokerfile path
+    dockerfile_path: ../../
+    # Optional build parameters
+    options: # optional
