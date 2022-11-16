@@ -292,13 +292,13 @@ const validate_shifts = (shifts) => {
 
 const addWard = async (req, res) => {
     // const session = req.session;
-    const { name, number, doctorCategories, shifts, maxLeaves, numConsecutiveGroupShifts } = req.body;
+    const { name, number, doctorCategories, shifts, maxLeaves, numConsecutiveGroupShifts,numOfShifts } = req.body;
     const shiftIds = []
     const bearerHeader = req.header('Authorization');
-    // const user = {}
+    // const user = {} 
 
     try {
-        const shifts_list = shifts.slice(0, number)
+        const shifts_list = shifts.slice(0, numOfShifts)
         console.log(shifts_list)
         // decode the jwt token
         if(!bearerHeader) {
