@@ -704,6 +704,14 @@ const changePassword = async (req, res) => {
   console.log(updateFields);
   //get the ward which is doctor belongs
   const consultant = await Consultant.findById({ _id: data["id"] });
+  const users = await User.find({email:data["email"]});
+
+  if (users.length !== 0){
+      if(JSON.stringify(users[0]._id) !== JSON.stringify(consultant.userId)){
+          return res.status(400).json({error: "Invalid email"})
+      }
+  }
+
   if(!consultant) {
       return res.status(404).json({error: "Invalid user"})
   }
