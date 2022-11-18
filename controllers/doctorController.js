@@ -28,15 +28,44 @@ const defineRequirements = async (req, res) => {
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }
+    //get the ward which is doctor belongs
+    const ward = await Ward.findById(doctor["WardID"]);
+    if(!ward) {
+        return res.status(404).json({error: "No ward"})
+    }
+    let count = 0;
+    const noOfRequirements = await Requirement.find({doctor: id});
+    // console.log(noOfRequirements)
+    if(!noOfRequirements) {
+        return res.status(400).json({error: "Bad request"})
+    }    
+    console.log("pass1")
+    for (let i = 0; i < noOfRequirements.length; i++) {
+        leavesofRequirements = await Leave.find({_id: noOfRequirements[i].leaves, date: { $regex: "2022-12" }});
+        if(!leavesofRequirements) {
+            return res.status(400).json({error: "Invalid leave"})
+            break;
+        }
+        if(leavesofRequirements.date == date){
+            return res.status(400).json({error: "Leave already requested"});
+            break;
+        }
+        count +=1;
+    }
+
+    if(count === ward.constraints.maxLeaves){
+        return res.status(400).json({error: "Maximum leaves for this month is reached"});
+    }
 
     const leavedshifts = [];
     //map the data from front end with the leaves schema
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < shiftTypes.length; i++) {
         shiftDetails = await Shift.findById(shiftTypes[i].id);
         if(!shiftDetails) {
             return res.status(400).json({error: "Invalid shift"})
             break;
         }
+        console.log(shiftDetails)
         if(shiftTypes[i].checked){
             leavedshifts.push(shiftTypes[i].id)
         }
@@ -46,12 +75,9 @@ const defineRequirements = async (req, res) => {
         date: date,
         shift: leavedshifts,
     };
+    console.log(leave)
     //create leave
     try {
-        const prerequested = await Leave.find(leave);
-        if(prerequested.length != 0){
-            return res.status(400).json({error: "Leave already requested"});
-        }
         const newleave = await Leave.create(leave);
         const requiredLeaves = [];
         requiredLeaves.push(newleave["_id"].toString());
@@ -211,6 +237,15 @@ const changePassword = async (req, res) => {
 
     //get the ward which is doctor belongs
     const doctor = await Doctor.findById({ _id: data["id"] });
+    const users = await User.find({email: data["email"]});
+console.log(users)
+    if (users.length !== 0){
+        // console.log(users[0],doctor, "pass1")
+        if(JSON.stringify(users[0]._id) !== JSON.stringify(doctor.userId)){
+            // console.log(users[0]._id,doctor.userId, "pass2")
+            return res.status(400).json({error: "Invalid email"})
+        }
+    }
     if(!doctor) {
         return res.status(404).json({error: "Invalid user"})
     }

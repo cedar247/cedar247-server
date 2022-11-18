@@ -77,9 +77,9 @@ const createSchedule = async (req, res) => {
     const current_date = new Date() // current date
 
     // compare deadline with current date
-    if(current_date < deadline) {
-      return res.status(200).json({ error: "Cannot create the schedule before the deadline"})
-    }
+    // if(current_date < deadline) {
+    //   return res.status(200).json({ error: "Cannot create the schedule before the deadline"})
+    // }
 
     if(schedule.status === 2) { // schedule has been already created
       return res.status(200).json({ error: "Schedule already had been created"})
@@ -273,18 +273,21 @@ const createSchedule = async (req, res) => {
             }
           }
 
-          // add shiftOfASchedule to database
-          const shiftOfASchedule = await ShiftOfASchedule.create(
-            {
-              doctors: doctors_all,
-              shift: shift,
-              date: date,
-              ward: wardId
-            }
-          )
+          if(doctors_all.length !== 0) {
+            // add shiftOfASchedule to database
+            const shiftOfASchedule = await ShiftOfASchedule.create(
+              {
+                doctors: doctors_all,
+                shift: shift,
+                date: date,
+                ward: wardId
+              }
+            )
 
-          // add id of shiftOfASchedule to data array
-          shift_data.push(shiftOfASchedule._id)
+            // add id of shiftOfASchedule to data array
+            shift_data.push(shiftOfASchedule._id)
+          }
+          
         }
       }
 
@@ -701,6 +704,14 @@ const changePassword = async (req, res) => {
   console.log(updateFields);
   //get the ward which is doctor belongs
   const consultant = await Consultant.findById({ _id: data["id"] });
+  const users = await User.find({email:data["email"]});
+
+  if (users.length !== 0){
+      if(JSON.stringify(users[0]._id) !== JSON.stringify(consultant.userId)){
+          return res.status(400).json({error: "Invalid email"})
+      }
+  }
+
   if(!consultant) {
       return res.status(404).json({error: "Invalid user"})
   }
@@ -754,11 +765,11 @@ const viewCalendar = async (req, res) => {
   }
   //get the doctor details according to the id
   const consultant = await Consultant.findById({ _id: id });
-  // if(!doctor) {
-  //     return res.status(404).json({error: "Invalid user"})
-  // }
+  if(!consultant) {
+      return res.status(404).json({error: "Invalid user"})
+  }
   //get the ward which is doctor belongs
-  const ward = await Ward.findById(Consultant["WardID"]);
+  const ward = await Ward.findById(consultant["WardID"]);
   if(!ward) {
       return res.status(404).json({error: "No ward"})
   }
