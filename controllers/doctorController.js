@@ -355,15 +355,15 @@ const getDoctorShifts = async (req, res) => {
         alldoctors[ward["doctors"][i]] = doctorDetails["name"];
     }
 
-    const fromShiftOfSchedules = await ShiftOfASchedule.find({ date: fromDate, ward: ward });
-    // console.log(fromShiftOfSchedules);
+    const fromShiftOfSchedules = await ShiftOfASchedule.find({ date: fromDate, ward: ward._id });
+    console.log(fromShiftOfSchedules);
     if(fromShiftOfSchedules.length == 0){
         // console.log("no shift Of Schedule")
         return res.status(404).json({error: "no shift Of Schedule"});
     }
 
-    const toShiftOfSchedules = await ShiftOfASchedule.find({ date: toDate, ward: ward });
-    // console.log(toShiftOfSchedules);
+    const toShiftOfSchedules = await ShiftOfASchedule.find({ date: toDate, ward: ward._id });
+    console.log(toShiftOfSchedules);
     if(toShiftOfSchedules.length == 0){
         // console.log("no shift Of Schedule")
         return res.status(404).json({error: "no shift Of Schedule"});
