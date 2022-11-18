@@ -774,7 +774,7 @@ const viewCalendar = async (req, res) => {
       return res.status(404).json({error: "No ward"})
   }
   //find schedules which is belong to the ward that we selected
-  const Schedules = await Schedule.find(consultant["WardID"]);
+  const Schedules = await Schedule.find({ward: consultant["WardID"]});
   if(!Schedules) {
       return res.status(404).json({error: "No Schedule"})
   }

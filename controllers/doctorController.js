@@ -41,7 +41,7 @@ const defineRequirements = async (req, res) => {
     }    
     // console.log("pass1")
     for (let i = 0; i < noOfRequirements.length; i++) {
-        leavesofRequirements = await Leave.find({_id: noOfRequirements[i].leaves, date: { $regex: "2022-12" }});
+        leavesofRequirements = await Leave.find({_id: noOfRequirements[i].leaves, date: { $regex: date.substring(0,7) }});
         if(!leavesofRequirements) {
             return res.status(400).json({error: "Invalid leave"})
             break;
@@ -130,7 +130,7 @@ const changeClendar = async (req, res) => {
         return res.status(404).json({error: "No ward"})
     }
     //find schedules which is belong to the ward that we selected
-    const Schedules = await Schedule.find(doctor["WardID"]);
+    const Schedules = await Schedule.find({ward: doctor["WardID"]});
     if(!Schedules) {
         return res.status(404).json({error: "No Schedule"})
     }
