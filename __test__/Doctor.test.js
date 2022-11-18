@@ -28,45 +28,44 @@ describe("POST /api/doctor/changeClendar", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/changeClendar").send({
-            "id": "633ab0f123be88c950fb8a89",
-            "allawAllDoctors":false,
+            id: "633ab0f123be88c950fb8a89",
+            allawAllDoctors: false,
         });
         expect(res.statusCode).toBe(200);
         expect(res.body[0].length).toBeGreaterThan(0);
         expect(res.body[1].length).toBeGreaterThan(0);
-        expect(res.body[0][0].title).toBe('morning');
-        expect(typeof res.body[1][0].text).toBe('string');
-
+        expect(res.body[0][0].title).toBe("morning");
+        expect(typeof res.body[1][0].text).toBe("string");
     });
 });
 describe("POST /api/doctor/changeClendar", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/changeClendar").send({
-            "id": "633ab0f123be88c950fb8a89",
-            "allawAllDoctors":true
+            id: "633ab0f123be88c950fb8a89",
+            allawAllDoctors: true,
         });
         expect(res.statusCode).toBe(200);
         expect(res.body[0].length).toBeGreaterThan(0);
         expect(res.body[1].length).toBeGreaterThan(0);
-        expect(res.body[0][0].title).toBe('morning');
-        expect(typeof res.body[1][0].text).toBe('string');
-
+        expect(res.body[0][0].title).toBe("morning");
+        expect(typeof res.body[1][0].text).toBe("string");
     });
 });
 describe("POST /api/doctor/changePassword", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
         const res = await request(app).post("/api/doctor/changePassword").send({
-            "id" : "633ab0f123be88c950fb8a89",
-            "email": "abcd@gmail.com",
-            "password":"Abcd@1234",
+            id: "633ab0f123be88c950fb8a89",
+            email: "abcd@gmail.com",
+            password: "Abcd@1234",
         });
         expect(res.statusCode).toBe(200);
         expect(res.body.name).toBe("vinojith");
-        expect(res.body.type).toBe( "DOCTOR");
+        expect(res.body.type).toBe("DOCTOR");
     });
 });
+
 // describe("POST /api/doctor/defineRequirements", () => {
 //     jest.setTimeout(100000);
 //     it("Should create a requirement", async () => {
@@ -85,37 +84,65 @@ describe("POST /api/doctor/changePassword", () => {
 //         }
 //     });
 // });
+
+describe("POST /api/doctor/defineRequirements", () => {
+    jest.setTimeout(30000);
+    it("should create a product", async () => {
+        const res = await request(app)
+            .post("/api/doctor/defineRequirements")
+            .send({
+                id: "633ab0f123be88c950fb8a89",
+                date: "2022-11-09",
+                shiftTypes: [
+                    { id: "633342d5b7cee2b016919f5e", checked: true },
+                    { id: "633489c62018c4ed921a0852", checked: true },
+                    { id: "63348a42457add832f5834c9", checked: false },
+                ],
+            });
+        if (res.statusCode == 200) {
+            expect(res.body.doctor).toBe("633ab0f123be88c950fb8a89");
+        } else {
+            expect(res.statusCode).toBe(400);
+            expect(res.body.error).toBe("Leave already requested");
+        }
+    });
+});
+
 describe("POST /api/doctor/setSwappingShifts", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
-        const res = await request(app).post("/api/doctor/setSwappingShifts").send({
-            "id": "633ab0f123be88c950fb8a89",
-            "fromShiftofSchedule": "63351516df919f17849a6d85",
-            "toShiftofSchedule": "633518fe88caa1f4cc6d3107",
-            "doctor": "633ab54a9fd528b9532b8d59"
-        });
-        if(res.statusCode == 200){
-            expect(res.body).toBe('Successfull');
-        }else{
+        const res = await request(app)
+            .post("/api/doctor/setSwappingShifts")
+            .send({
+                id: "633ab0f123be88c950fb8a89",
+                fromShiftofSchedule: "63351516df919f17849a6d85",
+                toShiftofSchedule: "633518fe88caa1f4cc6d3107",
+                doctor: "633ab54a9fd528b9532b8d59",
+            });
+        if (res.statusCode == 200) {
+            expect(res.body).toBe("Successfull");
+        } else {
             expect(res.statusCode).toBe(400);
-            expect(res.body.error).toBe("swapping requiest is exists")
+            expect(res.body.error).toBe("swapping requiest is exists");
         }
     });
 });
 describe("POST /api/doctor/getDoctorShifts", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
-        const res = await request(app).post("/api/doctor/getDoctorShifts").send({
-            "id": "633ab54a9fd528b9532b8d59",
-            "fromDate": "2022-11-12T06:59:48.000Z",
-            "toDate": "2022-11-15T06:59:48.000Z"
-        });
-        if(res.statusCode == 200){
+        const res = await request(app)
+            .post("/api/doctor/getDoctorShifts")
+            .send({
+                id: "633ab54a9fd528b9532b8d59",
+                fromDate: "2022-11-12T06:59:48.000Z",
+                toDate: "2022-11-15T06:59:48.000Z",
+            });
+        if (res.statusCode == 200) {
             expect(res.body[0].length).toBeGreaterThan(0);
             expect(res.body[1].length).toBeGreaterThan(0);
-        }else{
+        } else {
             expect(res.statusCode).toBe(404);
-            expect(res.body.error).toBe("no shift Of Schedule")
+            expect(res.body.error).toBe("no shift Of Schedule");
         }
     });
 });
@@ -127,18 +154,20 @@ describe("POST /api/doctor/getRequests", () => {
         });
         expect(res.statusCode).toBe(200);
         expect(res.body[0][0].name).toBe("Hasini Vijerathna");
-            expect(res.body[0].length).toBeGreaterThan(0);
-            expect(res.body[1][0].name).toBe("Hasini Vijerathna");
-            expect(res.body[1].length).toBeGreaterThan(0);
+        expect(res.body[0].length).toBeGreaterThan(0);
+        expect(res.body[1][0].name).toBe("Hasini Vijerathna");
+        expect(res.body[1].length).toBeGreaterThan(0);
     });
 });
 describe("POST /api/doctor/setRequestResponse", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
-        const res = await request(app).post("/api/doctor/setRequestResponse").send({
-            "requestId": "63659d816e7741c49acb48fd",
-            "Agree": true
-        });
+        const res = await request(app)
+            .post("/api/doctor/setRequestResponse")
+            .send({
+                requestId: "63659d816e7741c49acb48fd",
+                Agree: true,
+            });
         expect(res.statusCode).toBe(200);
         expect(res.body.fromDoctor).toBe("633ab54a9fd528b9532b8d59");
         expect(res.body.toDoctor).toBe("633ab0f123be88c950fb8a89");
