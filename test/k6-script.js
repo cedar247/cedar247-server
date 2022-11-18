@@ -7,125 +7,118 @@ export let options = { maxRedirects: 4 };
 
 const Request = Symbol.for("request");
 postman[Symbol.for("initial")]({
-  options,
-  environment: {
-    BaseUrl: "http://localhost:4000/"
-  }
+    options,
+    environment: {
+        BaseUrl: "http://localhost:4000/",
+    },
 });
 
-export default function() {
-  postman[Request]({
-    name: "changeClendar show doctor calendar",
-    id: "38658122-cf30-4878-90e3-f9a6c295cb3b",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/changeClendar",
-    data:
-      '{\n    "id": "633ab0f123be88c950fb8a89",\n    "allawAllDoctors":false\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+export default function () {
+    postman[Request]({
+        name: "changeClendar show doctor calendar",
+        id: "509e2294-ced4-4ed7-89c7-c1b76673d2cf",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/changeClendar",
+        data: '{\r\n    "id": "633ab0f123be88c950fb8a89",\r\n    "allawAllDoctors":false\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 
-  postman[Request]({
-    name: "changeClendar show all shecules",
-    id: "6d2e3232-0420-46c2-9042-e4c16601e55e",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/changeClendar",
-    data:
-      '{\n    "id": "633ab0f123be88c950fb8a89",\n    "allawAllDoctors":false\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+    postman[Request]({
+        name: "changeClendar show all shecules",
+        id: "40e4f6be-f3cb-47a3-8084-3e26dda8095c",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/changeClendar",
+        data: '{\r\n    "id": "633ab0f123be88c950fb8a89",\r\n    "allawAllDoctors":true\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 
-  postman[Request]({
-    name: "changePassword",
-    id: "80a6422d-3bb4-48cc-b7be-cab64cb61c34",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/changePassword",
-    data:
-      '{\n    "id" : "633ab0f123be88c950fb8a89",\n    "email": "abcd@gmail.com",\n    "password":"Abcd@1234"\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+    postman[Request]({
+        name: "changePassword",
+        id: "2b83f50f-fa18-4a07-aff1-bb4acd63d026",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/changePassword",
+        data: '{\r\n    "id" : "633ab0f123be88c950fb8a89",\r\n    "email": "abcd@gmail.com",\r\n    "password":"Abcd@1234"\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 
-  postman[Request]({
-    name: "defineRequirements",
-    id: "31b4c969-6ac4-4df8-b606-08759bab1f72",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/defineRequirements",
-    data:
-      '{\n    "id":"633ab0f123be88c950fb8a89",\n    "date":"2022-10-14",\n    "morning": true,\n    "evening": false,\n    "night":true\n\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+    postman[Request]({
+        name: "defineRequirements",
+        id: "2c07e572-5eff-4eed-a273-5440dc738a11",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/defineRequirements",
+        data: "{\r\n  id: '633ab0f123be88c950fb8a89',\r\n  date: '2022-11-09',\r\n  shiftTypes: [\r\n    { id: '633342d5b7cee2b016919f5e', checked: true },\r\n    { id: '633489c62018c4ed921a0852', checked: true },\r\n    { id: '63348a42457add832f5834c9', checked: false }\r\n  ]\r\n}",
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 
-  postman[Request]({
-    name: "setSwappingShifts",
-    id: "c0dda641-36f6-4215-b4b9-ffb8dbc045a6",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/setSwappingShifts",
-    data:
-      '{\n  "id": "633ab0f123be88c950fb8a89",\n  "fromShiftofSchedule": "63351516df919f17849a6d85",\n  "toShiftofSchedule": "633518fe88caa1f4cc6d3107",\n  "doctor": "633ab54a9fd528b9532b8d59"\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+    postman[Request]({
+        name: "setSwappingShifts",
+        id: "df8c1a06-9349-4e97-a461-f7316c684341",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/setSwappingShifts",
+        data: '{\r\n  "id": "633ab0f123be88c950fb8a89",\r\n  "fromShiftofSchedule": "63351516df919f17849a6d85",\r\n  "toShiftofSchedule": "633518fe88caa1f4cc6d3107",\r\n  "doctor": "633ab54a9fd528b9532b8d59"\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 
-  postman[Request]({
-    name: "getDoctorShifts",
-    id: "9a46af85-d365-4e6d-8af4-a84ae79b6e3f",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/getDoctorShifts",
-    data:
-      '{\n  "id": "633ab54a9fd528b9532b8d59",\n  "fromDate": "2022-11-12T06:59:48.000Z",\n  "toDate": "2022-11-15T06:59:48.000Z"\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+    postman[Request]({
+        name: "getDoctorShifts",
+        id: "ae6e910c-60a2-4b6c-a925-b8c0329c23eb",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/getDoctorShifts",
+        data: '{\r\n  "id": "633ab54a9fd528b9532b8d59",\r\n  "fromDate": "2022-11-12T06:59:48.000Z",\r\n  "toDate": "2022-11-15T06:59:48.000Z"\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 
-  postman[Request]({
-    name: "getShifts",
-    id: "de1c3e47-5f90-496e-a92f-73a8001a61ba",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/getShifts",
-    data: '{\n    "id":"633ab0f123be88c950fb8a89"\n}',
-    headers: {
-      "Content-Type": "application/json",
-      "x-nick-name": "{{access_token}}"
-    },
-  });
+    postman[Request]({
+        name: "getShifts",
+        id: "59a3be30-9b06-43d2-aeb7-c82702598e19",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/getShifts",
+        data: '{\r\n    "id":"633ab0f123be88c950fb8a89"\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
+    });
 
-  postman[Request]({
-    name: "getRequests",
-    id: "f898f088-f91e-4ad1-ad14-3ab4e4f4b841",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/getRequests",
-    data: '{\n    "id":"633ab0f123be88c950fb8a89"\n}',
-    headers: {
-      "Content-Type": "application/json",
-      "x-nick-name": "{{access_token}}"
-    },
-  });
+    postman[Request]({
+        name: "getRequests",
+        id: "33352e28-a9e0-4a40-b602-7b645f51b6b9",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/getRequests",
+        data: '{\r\n    "id":"633ab0f123be88c950fb8a89"\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
+    });
 
-  postman[Request]({
-    name: "setRequestResponse",
-    id: "fa027ba8-f751-4856-8425-8f61ea97e1ef",
-    method: "POST",
-    address: "{{BaseUrl}}api/doctor/setRequestResponse",
-    data:
-      '{\n    "requestId": "63659d816e7741c49acb48fd",\n    "Agree": true\n}',
-    headers: {
-        "Content-Type": "application/json",
-        "x-nick-name": "{{access_token}}"
-      },
+    postman[Request]({
+        name: "setRequestResponse",
+        id: "bf9a1351-0e58-48f7-a91e-d508eb501b09",
+        method: "POST",
+        address: "{{BaseUrl}}api/doctor/setRequestResponse",
+        data: '{\r\n    "requestId": "63659d816e7741c49acb48fd",\r\n    "Agree": true\r\n}',
+        headers: {
+            "Content-Type": "application/json",
+            "x-nick-name": "{{access_token}}",
+        },
     });
 }
