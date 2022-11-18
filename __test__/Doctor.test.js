@@ -65,6 +65,26 @@ describe("POST /api/doctor/changePassword", () => {
         expect(res.body.type).toBe("DOCTOR");
     });
 });
+
+// describe("POST /api/doctor/defineRequirements", () => {
+//     jest.setTimeout(100000);
+//     it("Should create a requirement", async () => {
+//         const res = await request(app).post("/api/doctor/defineRequirements").send({
+//             "id":"633ab0f123be88c950fb8a89",
+//             "date":"2022-10-14",
+//             "morning": true,
+//             "evening": false,
+//             "night":true
+//         });
+//         if(res.statusCode == 200){
+//             expect(res.body.doctor).toBe('633ab0f123be88c950fb8a89');
+//         }else{
+//             expect(res.statusCode).toBe(400);
+//             expect(res.body.error).toBe("Leave already requested")
+//         }
+//     });
+// });
+
 describe("POST /api/doctor/defineRequirements", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
@@ -87,6 +107,7 @@ describe("POST /api/doctor/defineRequirements", () => {
         }
     });
 });
+
 describe("POST /api/doctor/setSwappingShifts", () => {
     jest.setTimeout(30000);
     it("should create a product", async () => {
