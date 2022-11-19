@@ -22,7 +22,7 @@ app.use(session({
 }));
 
 const corsOptions ={
-    origin:'http://localhost:3000', 
+    origin:'https://cedar247.netlify.app', 
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }
