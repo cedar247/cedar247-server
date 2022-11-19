@@ -13,22 +13,22 @@ const authRoutes = require('./routes/auth')
 // express app
 const app = express()
 
-app.use(session({
-    secret : 'ABCDefg',
-    resave : false,
-    saveUninitialized : true,
-    cookie: { maxAge: 3*24*60*60*1000 },
-    expires: new Date(Date.now() + (3*24*60*60*1000))
-}));
+// app.use(session({
+//     secret : 'ABCDefg',
+//     resave : false,
+//     saveUninitialized : true,
+//     cookie: { maxAge: 3*24*60*60*1000 },
+//     expires: new Date(Date.now() + (3*24*60*60*1000))
+// }));
 
-const corsOptions ={
-    origin:'https://cedar247.netlify.app', 
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
-}
+// const corsOptions ={
+//     origin:'https://cedar247.netlify.app', 
+//     credentials:true,            //access-control-allow-credentials:true
+//     optionSuccessStatus:200
+// }
 
 // middleware
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(express.json())
 app.use((req, res, next) => {
     // console.log(req.path, req.method)
