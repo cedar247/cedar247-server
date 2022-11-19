@@ -21,8 +21,14 @@ app.use(session({
     expires: new Date(Date.now() + (3*24*60*60*1000))
 }));
 
+const corsOptions ={
+    origin:'http://localhost:3000', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
+}
+
 // middleware
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use((req, res, next) => {
     // console.log(req.path, req.method)
