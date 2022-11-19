@@ -40,7 +40,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"633ab0f123be88c950fb8a89\",\r\n    \"allawAllDoctors\":false\r\n}",
+					"raw": "{\r\n    \"id\": \"633ab0f123be88c950fb8a89\",\r\n    \"allawAllDoctors\":true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -94,7 +94,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\":\"633ab0f123be88c950fb8a89\",\r\n    \"date\":\"2022-10-14\",\r\n    \"morning\": true,\r\n    \"evening\": false,\r\n    \"night\":true\r\n\r\n}",
+					"raw": "{\r\n  id: '633ab0f123be88c950fb8a89',\r\n  date: '2022-11-09',\r\n  shiftTypes: [\r\n    { id: '633342d5b7cee2b016919f5e', checked: true },\r\n    { id: '633489c62018c4ed921a0852', checked: true },\r\n    { id: '63348a42457add832f5834c9', checked: false }\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -148,7 +148,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"id\": \"633ab54a9fd528b9532b8d59\",\r\n  \"fromDate\": \"2022-10-12T06:59:48.000Z\",\r\n  \"toDate\": \"2022-10-15T06:59:48.000Z\"\r\n}",
+					"raw": "{\r\n  \"id\": \"633ab54a9fd528b9532b8d59\",\r\n  \"fromDate\": \"2022-11-12T06:59:48.000Z\",\r\n  \"toDate\": \"2022-11-15T06:59:48.000Z\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

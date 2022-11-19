@@ -591,9 +591,9 @@ const getNumConsecGroups = async (req, res) => {
 
         const numConsecGroups = ward.constraints.numConsecutiveGroupShifts
 
-        if(numConsecGroups) {
+        // if(numConsecGroups) {
             return res.status(200).json({ numConsecGroups: numConsecGroups })
-        }
+        // }
     } catch (error) {
         return res.status(400).json({error: error.message})
     }
