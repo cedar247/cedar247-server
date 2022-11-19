@@ -665,20 +665,67 @@ const setRequestResponse = async (req, res) => {
   if(!SwappingShift) {
       return res.status(404).json({error: "Invalid Swappingshift"})
   } 
+  const fromDoctor = SwappingShift.fromDoctor;
+  const toDoctor = SwappingShift.toDoctor;
   const updateFields = {}
   if (agree){
       updateFields["status"]= 4;
   }else{
       updateFields["status"]= 3;
   }
-  console.log(updateFields)
+  // console.log(updateFields)
   try {
+      if(agree){
+        // console.log(agree,"pass");
+        const fromShiftOfSchedule = await ShiftOfASchedule.findById({ _id: SwappingShift.fromShiftofSchedule });
+        const toShiftOfSchedule = await ShiftOfASchedule.findById({ _id: SwappingShift.toShiftofSchedule });
+        // console.log(fromShiftOfSchedule,toShiftOfSchedule);
+        if(!(fromShiftOfSchedule["doctors"].includes(SwappingShift.fromDoctor))){
+          return res.status(400).json({error: "doctors are not in the shift"});
+        }
+        if(!(toShiftOfSchedule["doctors"].includes(SwappingShift.toDoctor))){
+          return res.status(400).json({error: "doctors are not in the shift"});
+        }
+        const fromDoctors = [];
+        for (let i = 0; i < fromShiftOfSchedule["doctors"].length; i++) {
+          if (JSON.stringify(fromDoctor) != JSON.stringify(fromShiftOfSchedule["doctors"][i])){
+            fromDoctors.push(fromShiftOfSchedule["doctors"][i]);
+          }
+        }
+        fromDoctors.push(toDoctor);
+        const toDoctors = [];
+        for (let i = 0; i < toShiftOfSchedule["doctors"].length; i++) {
+          if (JSON.stringify(toDoctor) != JSON.stringify(toShiftOfSchedule["doctors"][i])){
+            toDoctors.push(toShiftOfSchedule["doctors"][i]);
+          }
+        }
+        toDoctors.push(fromDoctor);
+
+        // console.log(fromDoctor,toDoctor);
+        // console.log(fromDoctors,toDoctors);
+        if (fromDoctors.length === fromShiftOfSchedule["doctors"].length && toDoctors.length === toShiftOfSchedule["doctors"].length) {
+          const newfromSwappingShift = await ShiftOfASchedule.findOneAndUpdate( { _id: fromShiftOfSchedule._id }, {doctors:fromDoctors});
+          if (!newfromSwappingShift) {
+            return res.status(400).json({ error: "error1" });
+          }
+          const newtoSwappingShift = await ShiftOfASchedule.findOneAndUpdate( { _id: toShiftOfSchedule._id }, {doctors:toDoctors});
+          if (!newtoSwappingShift) {
+            return res.status(400).json({ error: "error2" });
+          }
+          // console.log(newfromSwappingShift,newtoSwappingShift);
+        }else{
+          return res.status(400).json({ error: "error3" });
+        }
+      }
       const newSwappingShift = await SwappingShifts.findOneAndUpdate( { _id: requestId }, updateFields);
       if (!newSwappingShift) {
-          return res.status(404).json({ error: "No such swapping shift" });
+        return res.status(404).json({ error: "No such swapping shift" });
       }
+      // console.log(agree,"pass");
       return res.status(200).json(newSwappingShift)
+
   } catch (error) {
+    // console.log(error)
       return res.status(400).json({error: error.message})
   }
 }
