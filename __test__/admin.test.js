@@ -23,21 +23,21 @@ describe("GET /api/admin/getAll", () => {
     })
 })
 
-describe("POST /api/admin/getDoctorTypes", () => {
-    it("should return doctor categories", async() => {
-        const res = await request(app).post("/api/admin/getDoctorTypes").send({
-            WardID: '6339cfeed189aaa0727ebbf1'
-        });
-        expect(res.statusCode).toBe(200)
-    })
-})
+// describe("POST /api/admin/getDoctorTypes", () => {
+//     it("should return doctor categories", async() => {
+//         const res = await request(app).post("/api/admin/getDoctorTypes").send({
+//             WardID: '6339cfeed189aaa0727ebbf1'
+//         });
+//         expect(res.statusCode).toBe(200)
+//     })
+// })
 
-describe("GET /api/admin/:id", () => {
-    it("should return a consultant", async() => {
-        const res = await request(app).get("/api/admin/63340641d5d1332a578a8f8c");
-        expect(res.statusCode).toBe(200);
-    })
-})
+// describe("GET /api/admin/:id", () => {
+//     it("should return a consultant", async() => {
+//         const res = await request(app).get("/api/admin/63340641d5d1332a578a8f8c");
+//         expect(res.statusCode).toBe(200);
+//     })
+// })
 
   /* Closing database connection after each test. */
 afterEach(async () => {
